@@ -6,8 +6,8 @@
     <atom:link href="http://domain/rss.xml" rel="self" type="application/rss+xml" />
     <description></description>
     <language>en-au</language>
-    <pubDate>Mon, 31 Aug 2015 00:46:01 %z</pubDate>
-    <lastBuildDate>Mon, 31 Aug 2015 00:46:01 %z</lastBuildDate>
+    <pubDate>Mon, 31 Aug 2015 00:51:27 %z</pubDate>
+    <lastBuildDate>Mon, 31 Aug 2015 00:51:27 %z</lastBuildDate>
     
     <item>
       <title>My First Post</title>
@@ -69,7 +69,7 @@ as a completely static host. You don&apos;t have to have it generate anything wi
 &lt;pre&gt;&lt;code class=&quot;language-dos&quot;&gt;cd mrmdavidson.github.io
 pretzel.exe bake
 &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&quot;/img/posts/2015-08-30-myfirstpost/pretzel-tasting.png&quot; alt=&quot;Pretzel Tasting&quot; title=&quot;Pretzel Tasting&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/posts/2015-08-30-myfirstpost/pretzel-baking.png&quot; alt=&quot;Pretzel Baking&quot; title=&quot;Pretzel Baking&quot; /&gt;&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;Milliseconds later it&apos;ll have finished its work.&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;Now inside your repository you&apos;ll have an &lt;code&gt;_site&lt;/code&gt; directory. This is a static build of your site (Note: Anything starting with &lt;code&gt;_&lt;/code&gt; is ignored by Jekyll and Pretzel by convention). You can point your browser here and everything
 should work. But if you push this to your repository it won&apos;t have the desired results. What we&apos;re going to do is place a &amp;quot;.nojekyll&amp;quot; file in our directory - this is an instruction to Github to not run Jekyll on this repository.

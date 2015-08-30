@@ -6,8 +6,8 @@
     <atom:link href="http://domain/rss.xml" rel="self" type="application/rss+xml" />
     <description></description>
     <language>en-au</language>
-    <pubDate>Sun, 30 Aug 2015 23:16:05 %z</pubDate>
-    <lastBuildDate>Sun, 30 Aug 2015 23:16:05 %z</lastBuildDate>
+    <pubDate>Mon, 31 Aug 2015 00:46:01 %z</pubDate>
+    <lastBuildDate>Mon, 31 Aug 2015 00:46:01 %z</lastBuildDate>
     
     <item>
       <title>My First Post</title>
@@ -15,13 +15,102 @@
       <pubDate>Sun, 30 Aug 2015 00:00:00 %z</pubDate>
       <author>Author</author>
       <guid>http://domain/2015/08/30/myfirstpost.html</guid>
-      <description>&lt;h2&gt;Hello world...&lt;/h2&gt;
-&lt;pre&gt;&lt;code class=&quot;language-cs&quot;&gt;static void Main() 
-{
-    Console.WriteLine(&amp;quot;Hello World!&amp;quot;);
-}
+      <description>&lt;p&gt;Several years ago now Scott Hanselman wrote an blog post titled &lt;a href=&quot;http://www.hanselman.com/blog/YourBlogIsTheEngineOfCommunity.aspx&quot;&gt;Your Blog is the Engine of Community&lt;/a&gt;. The basic premise of it, for those too lazy to read it,
+was that you should own your own content. Sites like Twitter and Facebook are intrinsically transient and, perhaps more importantly, owned by someone else. &amp;quot;That makes sense!&amp;quot; I thought. And so I had a look about on the internet
+came across &lt;a href=&quot;https://pages.github.com/&quot;&gt;Github Pages&lt;/a&gt; had a quick play and... forgot about it. And then today a friend of mine was looking at ditching Wordpress for their own blog and asked if I had any suggestions. I gave a half
+hearted reply about something like &lt;a href=&quot;https://pages.github.com/&quot;&gt;Github Pages&lt;/a&gt; and then... thought about it... and thought I should finally get my act together and finish playing with them myself.&lt;/p&gt;
+&lt;p&gt;My initial issue last time I looked into Github Pages was that they run &lt;a href=&quot;http://jekyllrb.com/&quot;&gt;Jekyll&lt;/a&gt;. Which isn&apos;t a bad thing, it&apos;s a nice big of software, but as a Windows developer it seemed like a bunch of things I&apos;ve only
+had passing exposure to. I had a look for other static blog engines and came across &lt;a href=&quot;http://code52.org/pretzel.html&quot;&gt;Pretzel&lt;/a&gt;. Like Jekyll Pretzel generates a static blog for you from &lt;a href=&quot;http://daringfireball.net/projects/markdown/&quot;&gt;Markdown&lt;/a&gt;
+however unlike Jekyll it&apos;s written in .Net and feels more &amp;quot;natural&amp;quot; to a C# developer like myself. I did, however, have a few minor issues along the way, so I figured I&apos;d kill two birds with one stone and write about them.&lt;/p&gt;
+&lt;h2&gt;1.  Getting Pretzel&lt;/h2&gt;
+&lt;p&gt;Probably the easiest way to grab Pretzel is actually from &lt;a href=&quot;http://chocolatey.org&quot;&gt;Chocolatey&lt;/a&gt;. It&apos;s listed as &lt;a href=&quot;https://chocolatey.org/packages/pretzel&quot;&gt;Pretzel&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;This&apos;d be as simple as;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-dos&quot;&gt;choco install pretzel
 &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;This is my first post on the site!&lt;/p&gt;</description>
+&lt;p&gt;Personally I grabbed the source code from their &lt;a href=&quot;https://github.com/Code52/pretzel&quot;&gt;Github Page&lt;/a&gt; and built it myself&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-dos&quot;&gt;git clone https://github.com/Code52/pretzel
+cd pretzel
+build.cmd
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;After a while you&apos;ll end up with &lt;code&gt;artifacts\Pretzel.exe&lt;/code&gt; which you&apos;ll want to add to your path&lt;/p&gt;
+&lt;h2&gt;2.  Setting up your Github Page&lt;/h2&gt;
+&lt;p&gt;Github actually has really good documentation on this. The basic premise is you set up a new repository wih the name &lt;code&gt;$YourUsername$.github.io&lt;/code&gt;. Mine, for instance, is &lt;a href=&quot;https://github.com/MrMDavidson/mrmdavidson.github.io&quot;&gt;mrmdavidson.github.io&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;You&apos;ll want to clone this locally, add some content, and push it...&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-dos&quot;&gt;git clone https://github.com/MrMDavidson/mrmdavidson.github.io
+cd mrmdavidson.github.io
+echo &amp;quot;Hello World!&amp;quot; &amp;gt;&amp;gt; index.md
+git add index.md
+git commit -am &amp;quot;My first page!&amp;quot;
+git push
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If you then visit your own &lt;code&gt;$YourUsername$.github.io&lt;/code&gt; you&apos;ll see your &amp;quot;Hello World&amp;quot; page. Hooray!&lt;/p&gt;
+&lt;h2&gt;3.  Now let&apos;s make use of Pretzel&lt;/h2&gt;
+&lt;p&gt;To get started with Pretzel is actually pretty straight forward. We&apos;re going to jump into the directory we created early and, with Pretzel in our path, tell it to do some things&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-dos&quot;&gt;cd mrmdavidson.github.io
+pretzel.exe create
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This will create all the infrastructure required for your blog and create a sample post and an &lt;a href=&quot;/about.html&quot;&gt;about&lt;/a&gt; page. But it&apos;s all in MarkDown. How do we use it?&lt;/p&gt;
+&lt;p&gt;Pretzel has two main modes &amp;quot;Taste&amp;quot; and &amp;quot;Bake&amp;quot; (Because Pretzels, get it?). Taste allows you to fire everything up locally and test it. Pretzel includes everything needed for this (including an &lt;a href=&quot;http://owin.org/&quot;&gt;Owin&lt;/a&gt; based webserver).&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-dos&quot;&gt;pretzel.exe taste -p 8081
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&quot;/img/posts/2015-08-30-myfirstpost/pretzel-tasting.png&quot; alt=&quot;Pretzel Tasting&quot; title=&quot;Pretzel Tasting&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;(You may need to play around with the &lt;code&gt;-p 8081&lt;/code&gt; argument to specify a port that&apos;s currently not in use on your machine)&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;This will also fire up your default browser and show you your newly created blog post. You can play around with the content by editing the file it created in the &lt;code&gt;_posts/&lt;/code&gt; directory.&lt;/p&gt;
+&lt;p&gt;Once you get bored of poking at it we&apos;ll commit it and push it to your repository so it can be seen by the world!&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-dos&quot;&gt;git add *
+git commit -am &amp;quot;My new blog!&amp;quot;
+git push
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now visit your own Github Page. Eg. &lt;a href=&quot;http://mrmdavidson.github.io&quot;&gt;mrmdavidson.github.io&lt;/a&gt;&lt;/p&gt;
+&lt;h2&gt;4.  ... But something isn&apos;t right!&lt;/h2&gt;
+&lt;p&gt;For me, at least, I noticed some inconsistencies between what Jekyll generated and what Pretzel generated. This seems like something that&apos;d be horrible to debug. So I poked around a little and found that you can use Github PAges
+as a completely static host. You don&apos;t have to have it generate anything with Jekyll. &amp;quot;Interesting&amp;quot;, I thought. How does this work?&lt;/p&gt;
+&lt;p&gt;Well, remember earlier how I said Pretzel has two modes? Tasting and Baking? We want the baking mode;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-dos&quot;&gt;cd mrmdavidson.github.io
+pretzel.exe bake
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&quot;/img/posts/2015-08-30-myfirstpost/pretzel-tasting.png&quot; alt=&quot;Pretzel Tasting&quot; title=&quot;Pretzel Tasting&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Milliseconds later it&apos;ll have finished its work.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Now inside your repository you&apos;ll have an &lt;code&gt;_site&lt;/code&gt; directory. This is a static build of your site (Note: Anything starting with &lt;code&gt;_&lt;/code&gt; is ignored by Jekyll and Pretzel by convention). You can point your browser here and everything
+should work. But if you push this to your repository it won&apos;t have the desired results. What we&apos;re going to do is place a &amp;quot;.nojekyll&amp;quot; file in our directory - this is an instruction to Github to not run Jekyll on this repository.
+I know this seems counter intuitive, but trust me.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-dos&quot;&gt;echo &amp;quot;&amp;quot; &amp;gt; .nojekyll
+git add .nojekyll
+git commit -am &amp;quot;Opt out of Jekyll generation&amp;quot;
+git push
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now if you visit your lovely blog... it&apos;ll be completely broken. How is this helpful? Stay with me here!&lt;/p&gt;
+&lt;p&gt;What we&apos;re going to do is create a new branch. &lt;a href=&quot;https://github.com/MrMDavidson/mrmdavidson.github.io/tree/master&quot;&gt;Master&lt;/a&gt; will be used for the generated content of the site. And our new branch, say, &lt;a href=&quot;https://github.com/MrMDavidson/mrmdavidson.github.io/tree/pretzel&quot;&gt;Pretzel&lt;/a&gt;
+will be used to store our working blog. This way both our blog &amp;quot;data&amp;quot; and our generated site is under source control.&lt;/p&gt;
+&lt;p&gt;To avoid confusion we&apos;ll create two new copies of the repository...&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-dos&quot;&gt;git clone https://github.com/MrMDavidson/mrmdavidson.github.io mrmdavidson.github.io-blog
+git clone https://github.com/MrMDavidson/mrmdavidson.github.io mrmdavidson.github.io-generated
+cd mrmdavidson.github.io-blog
+git checkout -B pretzel
+git push origin
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now what we&apos;ll do is create blog posts in the &lt;code&gt;mrmdavidson.github.io-blog&lt;/code&gt; directory which pushes to a &amp;quot;Pretzel&amp;quot; branch. Once we&apos;ve finished tasting these we can generate the static content into master.
+Let&apos;s start by cleaning master. You&apos;ll want to delete from git everything in here but your &lt;code&gt;.nojekyll&lt;/code&gt; file. Once you&apos;ve done that...&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-dos&quot;&gt;cd mrmdavidson.github.io-blog
+pretzel.exe bake --destination ..\mrmdavidson.github.io-generated\
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The &lt;code&gt;--destination&lt;/code&gt; switch tells Pretzel to generate to a specific, relative-to-current, directory. In this example we&apos;re going to generate to our working copy of the Master branch.&lt;/p&gt;
+&lt;p&gt;We can now add everything in here and push to master...&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-dos&quot;&gt;cd mrmdavidson.github.io-generated
+git add *
+git commit -am &amp;quot;Initial generated version of the blog!&amp;quot;
+git push origin
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;5. Automating it...&lt;/h2&gt;
+&lt;p&gt;That all seems a bit tedious, but repeatable, so what I did was create a &lt;a href=&quot;https://github.com/MrMDavidson/mrmdavidson.github.io/blob/4a609925cfaf57f94a48322c3cc1f7af4acb77bc/generate.bat&quot;&gt;generate.bat&lt;/a&gt; in my Pretzel branch that bakes the blog, adds everything to git, and pushes it to master...&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-dos&quot;&gt;pretzel bake --destination ..\mrmdavidson.github.io-generated\
+pushd ..\mrmdavidson.github.io-generated
+git add *
+git commit -am &amp;quot;Generated site&amp;quot;
+git push origin
+popd
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This way once I&apos;m finished tasting my blog locally I can just run &lt;code&gt;generate.bat&lt;/code&gt; and seconds later everything is available to the public!&lt;/p&gt;</description>
     </item>
     
   </channel> 

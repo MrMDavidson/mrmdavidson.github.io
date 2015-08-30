@@ -2,5 +2,5 @@ exclude: [ generate.bat, Tools ]
 timezone: Australia/Melbourne
 pretzel: 
     engine: liquid
-defaults:
-    title: michaeldavidson.me
+default:
+    title: michaeldavidson.me 

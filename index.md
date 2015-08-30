@@ -1,6 +1,6 @@
 ---
 layout : layout
-title : SiteName
+title : michaeldavidson.me
 ---
 
 <ul class="posts">

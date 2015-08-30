@@ -6,8 +6,8 @@
     <atom:link href="http://domain/rss.xml" rel="self" type="application/rss+xml" />
     <description></description>
     <language>en-au</language>
-    <pubDate>Mon, 31 Aug 2015 00:56:07 %z</pubDate>
-    <lastBuildDate>Mon, 31 Aug 2015 00:56:07 %z</lastBuildDate>
+    <pubDate>Mon, 31 Aug 2015 01:04:08 %z</pubDate>
+    <lastBuildDate>Mon, 31 Aug 2015 01:04:08 %z</lastBuildDate>
     
     <item>
       <title>My First Post</title>
@@ -63,7 +63,7 @@ git push
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Now visit your own Github Page. Eg. &lt;a href=&quot;http://mrmdavidson.github.io&quot;&gt;mrmdavidson.github.io&lt;/a&gt;&lt;/p&gt;
 &lt;h2&gt;4.  ... But something isn&apos;t right!&lt;/h2&gt;
-&lt;p&gt;For me, at least, I noticed some inconsistencies between what Jekyll generated and what Pretzel generated. This seems like something that&apos;d be horrible to debug. So I poked around a little and found that you can use Github PAges
+&lt;p&gt;For me, at least, I noticed some inconsistencies between what Jekyll generated and what Pretzel generated. This seems like something that&apos;d be horrible to debug. So I poked around a little and found that you can use Github Pages
 as a completely static host. You don&apos;t have to have it generate anything with Jekyll. &amp;quot;Interesting&amp;quot;, I thought. How does this work?&lt;/p&gt;
 &lt;p&gt;Well, remember earlier how I said Pretzel has two modes? Tasting and Baking? We want the baking mode;&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&quot;language-dos&quot;&gt;cd mrmdavidson.github.io

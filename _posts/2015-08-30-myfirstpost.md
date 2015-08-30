@@ -86,7 +86,7 @@ Now visit your own Github Page. Eg. [mrmdavidson.github.io](http://mrmdavidson.g
     
 ## 4.  ... But something isn't right!
 
-For me, at least, I noticed some inconsistencies between what Jekyll generated and what Pretzel generated. This seems like something that'd be horrible to debug. So I poked around a little and found that you can use Github PAges
+For me, at least, I noticed some inconsistencies between what Jekyll generated and what Pretzel generated. This seems like something that'd be horrible to debug. So I poked around a little and found that you can use Github Pages
 as a completely static host. You don't have to have it generate anything with Jekyll. "Interesting", I thought. How does this work?
 
 Well, remember earlier how I said Pretzel has two modes? Tasting and Baking? We want the baking mode;

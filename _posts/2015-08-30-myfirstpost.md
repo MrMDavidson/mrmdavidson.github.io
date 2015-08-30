@@ -96,7 +96,7 @@ cd mrmdavidson.github.io
 pretzel.exe bake
 ```
 
-![Pretzel Tasting](/img/posts/2015-08-30-myfirstpost/pretzel-tasting.png "Pretzel Tasting")
+![Pretzel Baking](/img/posts/2015-08-30-myfirstpost/pretzel-baking.png "Pretzel Baking")
 
 *Milliseconds later it'll have finished its work.*
 

@@ -1,2 +1,4 @@
+exclude: [ generate.bat, Tools ]
+timezone: Australia/Melbourne
 pretzel: 
     engine: liquid

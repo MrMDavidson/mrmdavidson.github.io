@@ -15,8 +15,8 @@
 	<body>
 		<div id="container">
 			<div id="side">
-				<a href="/" id="home" title="home" alt="home"><img src="/img/logo.png" alt="Site Name" /></a>
-				<div id="hometext"><a href="/" >Site Name</a></div>
+				<a href="/" id="home" title="home" alt="home"><img src="/img/logo.png" alt="michaeldavidson.me" /></a>
+				<div id="hometext"><a href="/" >michaeldavidson.me</a></div>
 				<div class="section">
 					<ul>
 						<li><a href="/about.html">about</a></li>
@@ -35,15 +35,108 @@
 		
 		<span class="postdate">30 August, 2015
 			
+				<li><a href="/tag/pretzel">pretzel</a></li>
+			
+				<li><a href="/tag/blog">blog</a></li>
+			
 		</span>
 		
-		<h2>Hello world...</h2>
-<pre><code class="language-cs">static void Main() 
-{
-    Console.WriteLine(&quot;Hello World!&quot;);
-}
+		<p>Several years ago now Scott Hanselman wrote an blog post titled <a href="http://www.hanselman.com/blog/YourBlogIsTheEngineOfCommunity.aspx">Your Blog is the Engine of Community</a>. The basic premise of it, for those too lazy to read it,
+was that you should own your own content. Sites like Twitter and Facebook are intrinsically transient and, perhaps more importantly, owned by someone else. &quot;That makes sense!&quot; I thought. And so I had a look about on the internet
+came across <a href="https://pages.github.com/">Github Pages</a> had a quick play and... forgot about it. And then today a friend of mine was looking at ditching Wordpress for their own blog and asked if I had any suggestions. I gave a half
+hearted reply about something like <a href="https://pages.github.com/">Github Pages</a> and then... thought about it... and thought I should finally get my act together and finish playing with them myself.</p>
+<p>My initial issue last time I looked into Github Pages was that they run <a href="http://jekyllrb.com/">Jekyll</a>. Which isn't a bad thing, it's a nice big of software, but as a Windows developer it seemed like a bunch of things I've only
+had passing exposure to. I had a look for other static blog engines and came across <a href="http://code52.org/pretzel.html">Pretzel</a>. Like Jekyll Pretzel generates a static blog for you from <a href="http://daringfireball.net/projects/markdown/">Markdown</a>
+however unlike Jekyll it's written in .Net and feels more &quot;natural&quot; to a C# developer like myself. I did, however, have a few minor issues along the way, so I figured I'd kill two birds with one stone and write about them.</p>
+<h2>1.  Getting Pretzel</h2>
+<p>Probably the easiest way to grab Pretzel is actually from <a href="http://chocolatey.org">Chocolatey</a>. It's listed as <a href="https://chocolatey.org/packages/pretzel">Pretzel</a></p>
+<p>This'd be as simple as;</p>
+<pre><code class="language-dos">choco install pretzel
 </code></pre>
-<p>This is my first post on the site!</p>
+<p>Personally I grabbed the source code from their <a href="https://github.com/Code52/pretzel">Github Page</a> and built it myself</p>
+<pre><code class="language-dos">git clone https://github.com/Code52/pretzel
+cd pretzel
+build.cmd
+</code></pre>
+<p>After a while you'll end up with <code>artifacts\Pretzel.exe</code> which you'll want to add to your path</p>
+<h2>2.  Setting up your Github Page</h2>
+<p>Github actually has really good documentation on this. The basic premise is you set up a new repository wih the name <code>$YourUsername$.github.io</code>. Mine, for instance, is <a href="https://github.com/MrMDavidson/mrmdavidson.github.io">mrmdavidson.github.io</a></p>
+<p>You'll want to clone this locally, add some content, and push it...</p>
+<pre><code class="language-dos">git clone https://github.com/MrMDavidson/mrmdavidson.github.io
+cd mrmdavidson.github.io
+echo &quot;Hello World!&quot; &gt;&gt; index.md
+git add index.md
+git commit -am &quot;My first page!&quot;
+git push
+</code></pre>
+<p>If you then visit your own <code>$YourUsername$.github.io</code> you'll see your &quot;Hello World&quot; page. Hooray!</p>
+<h2>3.  Now let's make use of Pretzel</h2>
+<p>To get started with Pretzel is actually pretty straight forward. We're going to jump into the directory we created early and, with Pretzel in our path, tell it to do some things</p>
+<pre><code class="language-dos">cd mrmdavidson.github.io
+pretzel.exe create
+</code></pre>
+<p>This will create all the infrastructure required for your blog and create a sample post and an <a href="/about.html">about</a> page. But it's all in MarkDown. How do we use it?</p>
+<p>Pretzel has two main modes &quot;Taste&quot; and &quot;Bake&quot; (Because Pretzels, get it?). Taste allows you to fire everything up locally and test it. Pretzel includes everything needed for this (including an <a href="http://owin.org/">Owin</a> based webserver).</p>
+<pre><code class="language-dos">pretzel.exe taste -p 8081
+</code></pre>
+<p><img src="/img/posts/2015-08-30-myfirstpost/pretzel-tasting.png" alt="Pretzel Tasting" title="Pretzel Tasting" /></p>
+<p><em>(You may need to play around with the <code>-p 8081</code> argument to specify a port that's currently not in use on your machine)</em></p>
+<p>This will also fire up your default browser and show you your newly created blog post. You can play around with the content by editing the file it created in the <code>_posts/</code> directory.</p>
+<p>Once you get bored of poking at it we'll commit it and push it to your repository so it can be seen by the world!</p>
+<pre><code class="language-dos">git add *
+git commit -am &quot;My new blog!&quot;
+git push
+</code></pre>
+<p>Now visit your own Github Page. Eg. <a href="http://mrmdavidson.github.io">mrmdavidson.github.io</a></p>
+<h2>4.  ... But something isn't right!</h2>
+<p>For me, at least, I noticed some inconsistencies between what Jekyll generated and what Pretzel generated. This seems like something that'd be horrible to debug. So I poked around a little and found that you can use Github PAges
+as a completely static host. You don't have to have it generate anything with Jekyll. &quot;Interesting&quot;, I thought. How does this work?</p>
+<p>Well, remember earlier how I said Pretzel has two modes? Tasting and Baking? We want the baking mode;</p>
+<pre><code class="language-dos">cd mrmdavidson.github.io
+pretzel.exe bake
+</code></pre>
+<p><img src="/img/posts/2015-08-30-myfirstpost/pretzel-tasting.png" alt="Pretzel Tasting" title="Pretzel Tasting" /></p>
+<p><em>Milliseconds later it'll have finished its work.</em></p>
+<p>Now inside your repository you'll have an <code>_site</code> directory. This is a static build of your site (Note: Anything starting with <code>_</code> is ignored by Jekyll and Pretzel by convention). You can point your browser here and everything
+should work. But if you push this to your repository it won't have the desired results. What we're going to do is place a &quot;.nojekyll&quot; file in our directory - this is an instruction to Github to not run Jekyll on this repository.
+I know this seems counter intuitive, but trust me.</p>
+<pre><code class="language-dos">echo &quot;&quot; &gt; .nojekyll
+git add .nojekyll
+git commit -am &quot;Opt out of Jekyll generation&quot;
+git push
+</code></pre>
+<p>Now if you visit your lovely blog... it'll be completely broken. How is this helpful? Stay with me here!</p>
+<p>What we're going to do is create a new branch. <a href="https://github.com/MrMDavidson/mrmdavidson.github.io/tree/master">Master</a> will be used for the generated content of the site. And our new branch, say, <a href="https://github.com/MrMDavidson/mrmdavidson.github.io/tree/pretzel">Pretzel</a>
+will be used to store our working blog. This way both our blog &quot;data&quot; and our generated site is under source control.</p>
+<p>To avoid confusion we'll create two new copies of the repository...</p>
+<pre><code class="language-dos">git clone https://github.com/MrMDavidson/mrmdavidson.github.io mrmdavidson.github.io-blog
+git clone https://github.com/MrMDavidson/mrmdavidson.github.io mrmdavidson.github.io-generated
+cd mrmdavidson.github.io-blog
+git checkout -B pretzel
+git push origin
+</code></pre>
+<p>Now what we'll do is create blog posts in the <code>mrmdavidson.github.io-blog</code> directory which pushes to a &quot;Pretzel&quot; branch. Once we've finished tasting these we can generate the static content into master.
+Let's start by cleaning master. You'll want to delete from git everything in here but your <code>.nojekyll</code> file. Once you've done that...</p>
+<pre><code class="language-dos">cd mrmdavidson.github.io-blog
+pretzel.exe bake --destination ..\mrmdavidson.github.io-generated\
+</code></pre>
+<p>The <code>--destination</code> switch tells Pretzel to generate to a specific, relative-to-current, directory. In this example we're going to generate to our working copy of the Master branch.</p>
+<p>We can now add everything in here and push to master...</p>
+<pre><code class="language-dos">cd mrmdavidson.github.io-generated
+git add *
+git commit -am &quot;Initial generated version of the blog!&quot;
+git push origin
+</code></pre>
+<h2>5. Automating it...</h2>
+<p>That all seems a bit tedious, but repeatable, so what I did was create a <a href="https://github.com/MrMDavidson/mrmdavidson.github.io/blob/4a609925cfaf57f94a48322c3cc1f7af4acb77bc/generate.bat">generate.bat</a> in my Pretzel branch that bakes the blog, adds everything to git, and pushes it to master...</p>
+<pre><code class="language-dos">pretzel bake --destination ..\mrmdavidson.github.io-generated\
+pushd ..\mrmdavidson.github.io-generated
+git add *
+git commit -am &quot;Generated site&quot;
+git push origin
+popd
+</code></pre>
+<p>This way once I'm finished tasting my blog locally I can just run <code>generate.bat</code> and seconds later everything is available to the public!</p>
 	</div>
 </div>
 <div id="page-navigation"> 

@@ -17,7 +17,7 @@
   
 	
 	<url>
-		<loc>http://domain/D:/Code/mrmdavidson.github.io/../mrmdavidson.github.io.output/about.html</loc>
+		<loc>http://domain/C:/Users/mrmda_000/Blog/mrmdavidson.github.io-pretzel/../mrmdavidson.github.io-master/about.html</loc>
 		<changefreq>daily</changefreq>
 		<priority>1.00</priority>
 	</url>
@@ -25,7 +25,7 @@
   
 	
 	<url>
-		<loc>http://domain/D:/Code/mrmdavidson.github.io/../mrmdavidson.github.io.output/atom.xml</loc>
+		<loc>http://domain/C:/Users/mrmda_000/Blog/mrmdavidson.github.io-pretzel/../mrmdavidson.github.io-master/atom.xml</loc>
 		<changefreq>daily</changefreq>
 		<priority>1.00</priority>
 	</url>
@@ -35,7 +35,7 @@
   
 	
 	<url>
-		<loc>http://domain/D:/Code/mrmdavidson.github.io/../mrmdavidson.github.io.output/index.html</loc>
+		<loc>http://domain/C:/Users/mrmda_000/Blog/mrmdavidson.github.io-pretzel/../mrmdavidson.github.io-master/index.html</loc>
 		<changefreq>daily</changefreq>
 		<priority>1.00</priority>
 	</url>
@@ -43,7 +43,7 @@
   
 	
 	<url>
-		<loc>http://domain/D:/Code/mrmdavidson.github.io/../mrmdavidson.github.io.output/rss.xml</loc>
+		<loc>http://domain/C:/Users/mrmda_000/Blog/mrmdavidson.github.io-pretzel/../mrmdavidson.github.io-master/rss.xml</loc>
 		<changefreq>daily</changefreq>
 		<priority>1.00</priority>
 	</url>
@@ -51,7 +51,7 @@
   
 	
 	<url>
-		<loc>http://domain/D:/Code/mrmdavidson.github.io/../mrmdavidson.github.io.output/sitemap.xml</loc>
+		<loc>http://domain/C:/Users/mrmda_000/Blog/mrmdavidson.github.io-pretzel/../mrmdavidson.github.io-master/sitemap.xml</loc>
 		<changefreq>daily</changefreq>
 		<priority>1.00</priority>
 	</url>
@@ -69,6 +69,14 @@
   
 	
   
+	
+  
+	
+	<url>
+		<loc>http://domain/tag/pretzel/</loc>
+		<changefreq>daily</changefreq>
+		<priority>1.00</priority>
+	</url>
 	
   
 </urlset>

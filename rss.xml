@@ -6,8 +6,8 @@
     <atom:link href="http://domain/rss.xml" rel="self" type="application/rss+xml" />
     <description></description>
     <language>en-au</language>
-    <pubDate>Mon, 31 Aug 2015 01:04:08 %z</pubDate>
-    <lastBuildDate>Mon, 31 Aug 2015 01:04:08 %z</lastBuildDate>
+    <pubDate>Mon, 31 Aug 2015 13:58:52 %z</pubDate>
+    <lastBuildDate>Mon, 31 Aug 2015 13:58:52 %z</lastBuildDate>
     
     <item>
       <title>My First Post</title>
@@ -19,7 +19,7 @@
 was that you should own your own content. Sites like Twitter and Facebook are intrinsically transient and, perhaps more importantly, owned by someone else. &amp;quot;That makes sense!&amp;quot; I thought. And so I had a look about on the internet
 came across &lt;a href=&quot;https://pages.github.com/&quot;&gt;Github Pages&lt;/a&gt; had a quick play and... forgot about it. And then today a friend of mine was looking at ditching Wordpress for their own blog and asked if I had any suggestions. I gave a half
 hearted reply about something like &lt;a href=&quot;https://pages.github.com/&quot;&gt;Github Pages&lt;/a&gt; and then... thought about it... and thought I should finally get my act together and finish playing with them myself.&lt;/p&gt;
-&lt;p&gt;My initial issue last time I looked into Github Pages was that they run &lt;a href=&quot;http://jekyllrb.com/&quot;&gt;Jekyll&lt;/a&gt;. Which isn&apos;t a bad thing, it&apos;s a nice big of software, but as a Windows developer it seemed like a bunch of things I&apos;ve only
+&lt;p&gt;My initial issue last time I looked into Github Pages was that they run &lt;a href=&quot;http://jekyllrb.com/&quot;&gt;Jekyll&lt;/a&gt;. Which isn&apos;t a bad thing, it&apos;s a nice bit of software, but as a Windows developer it seemed like a bunch of things I&apos;ve only
 had passing exposure to. I had a look for other static blog engines and came across &lt;a href=&quot;http://code52.org/pretzel.html&quot;&gt;Pretzel&lt;/a&gt;. Like Jekyll Pretzel generates a static blog for you from &lt;a href=&quot;http://daringfireball.net/projects/markdown/&quot;&gt;Markdown&lt;/a&gt;
 however unlike Jekyll it&apos;s written in .Net and feels more &amp;quot;natural&amp;quot; to a C# developer like myself. I did, however, have a few minor issues along the way, so I figured I&apos;d kill two birds with one stone and write about them.&lt;/p&gt;
 &lt;h2&gt;1.  Getting Pretzel&lt;/h2&gt;

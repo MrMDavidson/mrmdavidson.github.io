@@ -10,7 +10,7 @@ was that you should own your own content. Sites like Twitter and Facebook are in
 came across [Github Pages](https://pages.github.com/) had a quick play and... forgot about it. And then today a friend of mine was looking at ditching Wordpress for their own blog and asked if I had any suggestions. I gave a half
 hearted reply about something like [Github Pages](https://pages.github.com/) and then... thought about it... and thought I should finally get my act together and finish playing with them myself.
 
-My initial issue last time I looked into Github Pages was that they run [Jekyll](http://jekyllrb.com/). Which isn't a bad thing, it's a nice big of software, but as a Windows developer it seemed like a bunch of things I've only
+My initial issue last time I looked into Github Pages was that they run [Jekyll](http://jekyllrb.com/). Which isn't a bad thing, it's a nice bit of software, but as a Windows developer it seemed like a bunch of things I've only
 had passing exposure to. I had a look for other static blog engines and came across [Pretzel](http://code52.org/pretzel.html). Like Jekyll Pretzel generates a static blog for you from [Markdown](http://daringfireball.net/projects/markdown/)
 however unlike Jekyll it's written in .Net and feels more "natural" to a C# developer like myself. I did, however, have a few minor issues along the way, so I figured I'd kill two birds with one stone and write about them.
 

@@ -3,13 +3,113 @@
   <title>Feed Name</title>
   <link href="http://domain/"/>
   <link type="application/atom+xml" rel="self" href="http://domain/atom.xml"/>
-  <updated>2015-08-31T13:59:17.9427601+10:00</updated>
+  <updated>2015-09-01T02:31:20.5482484+10:00</updated>
   <id>http://domain/</id>
   <author>
     <name>Author</name>
     <email>Email</email>
   </author>
 
+  
+  <entry>
+    <id>http://domain//2015/08/31/tags.html</id>
+    <link type="text/html" rel="alternate" href="http://domain//2015/08/31/tags.html"/>
+    <title>Tags?</title>
+    <updated>2015-08-31T00:00:00+10:00</updated>
+    <author>
+      <name>Author</name>
+      <uri>http://domain/</uri>
+    </author>
+    <content type="html">&lt;p&gt;After doing my initial &lt;a href=&quot;/2015/08/30/myfirstpost.html&quot;&gt;post yesterday&lt;/a&gt; I realised it&apos;d be useful to have tags (or categories, whatever your preferred nomenclature) support. It&apos;s an easy way for a user to quickly find everything relating to, say, &lt;a href=&quot;/tag/pretzel&quot;&gt;Pretzel&lt;/a&gt; without having to read about &lt;a href=&quot;/tag/cats&quot;&gt;cats&lt;/a&gt;. So now, how do we go about getting such a feature? Remeember that Pretzel is a static blog engine. Everything is generated offline on your computer and then uploaded to your host (in my case, &lt;a href=&quot;https://pages.github.com&quot;&gt;Github Pages&lt;/a&gt; so there&apos;s no hitting a database to pull back the relevant files.&lt;/p&gt;
+&lt;p&gt;If you investigate a little bit you&apos;ll find that when you&apos;re viewing an individual post the template used to generate the static HTML is &lt;a href=&quot;https://github.com/MrMDavidson/mrmdavidson.github.io/blob/a3b3e198dbecbbe6e86893ab0276963eb694cf70/_layouts/post.html&quot;&gt;_layouts/post.html&lt;/a&gt; which seems to have some code relating to tags;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;{% for tag in page.tags %}
+    &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;/tag/{{ tag }}&amp;quot;&amp;gt;{{ tag }}&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;
+{% endfor %}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Alright, so it seems that the default set up has some support for it! Excellent! If you look at the mark down source files for your post you&apos;ll see there&apos;s a block of &lt;a href=&quot;http://yaml.org&quot;&gt;YAML&lt;/a&gt; at the top (actually this is something Jekyll refers to as &lt;a href=&quot;http://jekyllrb.com/docs/frontmatter/&quot;&gt;Front Matter&lt;/a&gt; and is how it determines the file is special and needs processing. Pretzel follows this same convention). Okay, so we need to add a &amp;quot;tag&amp;quot; to this block. The Front Matter for this post might be;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-yaml&quot;&gt;---
+layout: post
+title: &amp;quot;Tags?&amp;quot;
+tags: [ pretzel, blog ]
+---
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This tells Pretzel that this post has two tags associated with it; &lt;a href=&quot;/tag/pretzel&quot;&gt;Pretzel&lt;/a&gt; and &lt;a href=&quot;/tag/blog&quot;&gt;blog&lt;/a&gt;. Let&apos;s fire up Pretzel and &amp;quot;taste&amp;quot; things...&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/posts/2015-08-31-tags/not-working-tags.png&quot; alt=&quot;Tag Rendering&quot; title=&quot;Tag Rendering&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;Success! I&apos;ll just go click on those tag links and...&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/posts/2015-08-31-tags/404-tag-not-found.png&quot; alt=&quot;404, Tag Not Found&quot; title=&quot;Tag Not Found&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;I should have known that&apos;d be too easy. If you have a look about the place you&apos;ll find that there&apos;s a plugin for Jekyll to support &lt;a href=&quot;http://jekyllrb.com/docs/plugins/#tags&quot;&gt;tags&lt;/a&gt;. But that&apos;s not that helpful to us. So back to the drawing board. I came across a post on using &lt;a href=&quot;http://www.minddust.com/post/tags-and-categories-on-github-pages/&quot;&gt;tags on Github Pages&lt;/a&gt; - it seems that Github Pages don&apos;t support the tags plugin, so Jekyll users are in a similar boat to us. Interesting!&lt;/p&gt;
+&lt;p&gt;Going through the steps in the &lt;a href=&quot;http://www.minddust.com/post/tags-and-categories-on-github-pages/&quot;&gt;Minddust post&lt;/a&gt; we can straight away skip the first two - the default Pretzel templates already contain markup for tags. So let&apos;s start with creating a new layout. So let&apos;s create a new file &lt;code&gt;_layouts/posts_by_tag.html&lt;/code&gt; and we&apos;ll copy the content from Minddust;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;h1&amp;gt;Articles by tag :{{ page.tag }}&amp;lt;/h1&amp;gt;
+&amp;lt;div&amp;gt;
+    {% if site.tags[page.tag] %}
+        {% for post in site.tags[page.tag] %}
+            &amp;lt;a href=&amp;quot;{{ post.url }}/&amp;quot;&amp;gt;{{ post.title }}&amp;lt;/a&amp;gt;
+        {% endfor %}
+    {% else %}
+        &amp;lt;p&amp;gt;There are no posts for this tag.&amp;lt;/p&amp;gt;
+    {% endif %}
+&amp;lt;/div&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;After a bit of trial and error I found you don&apos;t actually need &lt;code&gt;_data/tags.yml&lt;/code&gt; either. So we&apos;ll skip that, too. We do, however, have to create a template-per-tag. Now this is where this method will kind of fall down. If you use lots and lots of tags this is the sort of thing that you (well, I am, anyhow) are likely to forget. If you do... then your readers will get a 404 when they click on a tag that you haven&apos;t &amp;quot;populated&amp;quot; yet. Anyhow, let&apos;s live with this for now and create our first tag layout file. For me that&apos;s &lt;code&gt;tag/blog.md&lt;/code&gt; (Note: The &lt;code&gt;tag&lt;/code&gt; portion is because our URLs will be of the form &lt;code&gt;tag/blog&lt;/code&gt; - if you wanted these to be of the form &lt;code&gt;my-awesome-tags/blog&lt;/code&gt; your &lt;code&gt;blog.md&lt;/code&gt; would instead live in the &lt;code&gt;my-awesome-tags&lt;/code&gt; directory. Jekyll / Pretzel will copy directories from the input to the output unless they start with an underscore).&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-yaml&quot;&gt;---
+layout: posts_by_tag
+tag: blog
+permalink: /tag/blog
+---
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Nothing else is needed in our layout file. A couple of notes; the &lt;code&gt;layout&lt;/code&gt; value should be the filename of your layout file, without the path or extension, that you created earlier  (eg. I have &lt;code&gt;_layouts/posts_by_tag.html&lt;/code&gt; so this value is &lt;code&gt;posts_by_tag&lt;/code&gt;). The &lt;code&gt;permalink&lt;/code&gt; tag here just sets the output URL to be used. I want to serve my tag page as &lt;code&gt;/tag/blog&lt;/code&gt; instead of the default &lt;code&gt;/tag/blog.html&lt;/code&gt;. Now that that&apos;s done let&apos;s test it out!&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/posts/2015-08-31-tags/no-posts-for-tag.png&quot; alt=&quot;No articles?!?&quot; title=&quot;No posts for tag?&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;... And apparently I have even fewer blog posts than I thought! The good news is we aren&apos;t getting a 404 anymore. The bad news is... we&apos;re not getting our nice list of posts for the tag. What gives? I did a little digging and it turns out it&apos;s the syntax of the layout file. Whilst Pretzel is largely compatible with Jekyll it isn&apos;t 100% so. The way it does tags is one of those differences. In Jekyll it seems like it&apos;s a dictionary of tag names to posts. However in Pretzel tags are a list of tag items each of which has the name of the tag and all of the posts for that tag. (&lt;em&gt;Side note: I believe Categories work the same way&lt;/em&gt;). So our copy-pasta&apos;d layout file just isn&apos;t going to cut it.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;h1&amp;gt;Posts by tag {{ page.tag }}&amp;lt;/h1&amp;gt;
+&amp;lt;div&amp;gt;
+    {% assign HasTag = false %}
+    
+    {% for tag in site.tags %}
+        {% if tag.Name ==  page.tag %}
+            {% assign HasTag = true %}
+            {% for post in tag.Posts %}
+                &amp;lt;p&amp;gt;&amp;lt;a href=&amp;quot;{{ post.url }}&amp;quot;&amp;gt;{{post.title}}&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt; 
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+    
+    {% if HasTag == false %}
+        &amp;lt;p&amp;gt;There&apos;s no posts for &amp;quot;{{ page.tag }}&amp;quot;!&amp;lt;/p&amp;gt;
+    {% endif %}
+&amp;lt;/div&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;First off we&apos;re going to set a variable &lt;code&gt;HasTag&lt;/code&gt; to &lt;code&gt;false&lt;/code&gt;. We&apos;ll then loop through all of the &lt;code&gt;tags&lt;/code&gt; that have been used on our site and compare the &lt;code&gt;Name&lt;/code&gt; to the &lt;code&gt;tag&lt;/code&gt; the user is currently looking at. If they match we set &lt;code&gt;HasTag&lt;/code&gt; to &lt;code&gt;true&lt;/code&gt; and loop through all of the &lt;code&gt;Posts&lt;/code&gt; on the &lt;code&gt;tag&lt;/code&gt; and output a link to the post using it&apos;s title. Finally if &lt;code&gt;HasTag&lt;/code&gt; is still &lt;code&gt;false&lt;/code&gt; we can print out &amp;quot;No tags found&amp;quot; style message. Now let&apos;s try again...&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/posts/2015-08-31-tags/ugly-tagged-posts.png&quot; alt=&quot;It&apos;s ugly, but it works!&quot; title=&quot;It&apos;s ugly, but it works!&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;... And it works! It&apos;s not pretty but it&apos;s a list of all my posts. Now why does this look so bland compared to the rest of the posts (not that they&apos;re terribly pretty, but still!). If you snoop about your setup you&apos;ll see there&apos;s &lt;code&gt;_layouts/layout.html&lt;/code&gt; which has all the base styling for your site. When you look at the default &lt;code&gt;_layouts/post.html&lt;/code&gt; you&apos;ll see at the top it has&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-yaml&quot;&gt;---
+layout: layout
+---
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It seems a little redundant... but it&apos;s actually saying &amp;quot;Inherit the &lt;code&gt;layout&lt;/code&gt; for this file from the file stored at &lt;code&gt;_layouts/&lt;/code&gt;&lt;strong&gt;&lt;code&gt;layout&lt;/code&gt;&lt;/strong&gt;&lt;code&gt;.html&lt;/code&gt;. So, we just need to add a similar tag to our &lt;code&gt;posts_by_tag.html&lt;/code&gt;;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;---
+layout: layout
+---
+&amp;lt;h1&amp;gt;Posts by tag {{ page.tag }}&amp;lt;/h1&amp;gt;
+&amp;lt;div&amp;gt;
+    {% assign HasTag = false %}
+    
+    {% for tag in site.tags %}
+        {% if tag.Name ==  page.tag %}
+            {% assign HasTag = true %}
+            {% for post in tag.Posts %}
+                &amp;lt;p&amp;gt;&amp;lt;a href=&amp;quot;{{ post.url }}&amp;quot;&amp;gt;{{post.title}}&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt; 
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+    
+    {% if HasTag == false %}
+        &amp;lt;p&amp;gt;There&apos;s no posts for &amp;quot;{{ page.tag }}&amp;quot;!&amp;lt;/p&amp;gt;
+    {% endif %}
+&amp;lt;/div&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&quot;/img/posts/2015-08-31-tags/styled-tagged-posts.png&quot; alt=&quot;Prettier styled posts&quot; title=&quot;Prettier styled posts&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;And that&apos;s about it! Have a look through the list of &lt;a href=&quot;http://jekyllrb.com/docs/variables/&quot;&gt;Liquid Variables&lt;/a&gt; for other details you may wish to include on your listing page. And finally  don&apos;t forget you&apos;ll need to go through and create a corresponding &lt;code&gt;.md&lt;/code&gt; file in &lt;code&gt;tag&lt;/code&gt; for each tag you use on your site. In the future I&apos;ll look at seeing if this is something I can automate as I&apos;m not one for doing something a computer will do much more reliably.&lt;/p&gt;</content>
+  </entry>
   
   <entry>
     <id>http://domain//2015/08/30/myfirstpost.html</id>
@@ -24,7 +124,7 @@
 was that you should own your own content. Sites like Twitter and Facebook are intrinsically transient and, perhaps more importantly, owned by someone else. &amp;quot;That makes sense!&amp;quot; I thought. And so I had a look about on the internet
 came across &lt;a href=&quot;https://pages.github.com/&quot;&gt;Github Pages&lt;/a&gt; had a quick play and... forgot about it. And then today a friend of mine was looking at ditching Wordpress for their own blog and asked if I had any suggestions. I gave a half
 hearted reply about something like &lt;a href=&quot;https://pages.github.com/&quot;&gt;Github Pages&lt;/a&gt; and then... thought about it... and thought I should finally get my act together and finish playing with them myself.&lt;/p&gt;
-&lt;p&gt;My initial issue last time I looked into Github Pages was that they run &lt;a href=&quot;http://jekyllrb.com/&quot;&gt;Jekyll&lt;/a&gt;. Which isn&apos;t a bad thing, it&apos;s a nice bit of software, but as a Windows developer it seemed like a bunch of things I&apos;ve only
+&lt;p&gt;My initial issue last time I looked into Github Pages was that they run &lt;a href=&quot;http://jekyllrb.com/&quot;&gt;Jekyll&lt;/a&gt;. Which isn&apos;t a bad thing, it&apos;s a nice big of software, but as a Windows developer it seemed like a bunch of things I&apos;ve only
 had passing exposure to. I had a look for other static blog engines and came across &lt;a href=&quot;http://code52.org/pretzel.html&quot;&gt;Pretzel&lt;/a&gt;. Like Jekyll Pretzel generates a static blog for you from &lt;a href=&quot;http://daringfireball.net/projects/markdown/&quot;&gt;Markdown&lt;/a&gt;
 however unlike Jekyll it&apos;s written in .Net and feels more &amp;quot;natural&amp;quot; to a C# developer like myself. I did, however, have a few minor issues along the way, so I figured I&apos;d kill two birds with one stone and write about them.&lt;/p&gt;
 &lt;h2&gt;1.  Getting Pretzel&lt;/h2&gt;

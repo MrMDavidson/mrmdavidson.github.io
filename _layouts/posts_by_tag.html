@@ -1,0 +1,21 @@
+---
+layout: layout
+---
+
+<h1>Posts  by tag {{ page.tag }}</h1>
+<div>
+    {% assign HasTag = false %}
+    
+    {% for tag in site.tags %}
+        {% if tag.Name ==  page.tag %}
+            {% assign HasTag = true %}
+            {% for post in tag.Posts %}
+                <p><a href="{{ post.url }}">{{post.title}}</a> on {{ post.date | date: '%Y-%m-%d' }}</p> 
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+    
+    {% if HasTag == false %}
+        <p>There's no posts for "{{ page.tag }}"!</p>
+    {% endif %}
+</div>

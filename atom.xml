@@ -3,7 +3,7 @@
   <title>Feed Name</title>
   <link href="http://domain/"/>
   <link type="application/atom+xml" rel="self" href="http://domain/atom.xml"/>
-  <updated>2015-09-01T12:07:40.3178467+10:00</updated>
+  <updated>2015-09-01T12:10:53.9558367+10:00</updated>
   <id>http://domain/</id>
   <author>
     <name>Author</name>
@@ -20,7 +20,7 @@
       <name>Author</name>
       <uri>http://domain/</uri>
     </author>
-    <content type="html">&lt;p&gt;After doing my initial &lt;a href=&quot;/2015/08/30/myfirstpost.html&quot;&gt;post yesterday&lt;/a&gt; I realised it&apos;d be useful to have tags (or categories, whatever your preferred nomenclature) support. It&apos;s an easy way for a user to quickly find everything relating to, say, &lt;a href=&quot;/tag/pretzel&quot;&gt;Pretzel&lt;/a&gt; without having to read about &lt;a href=&quot;/tag/cats&quot;&gt;cats&lt;/a&gt;. How do we go about getting such a feature? Remeember that Pretzel is a static blog engine. Everything is generated offline on your computer and then uploaded to your host (in my case, &lt;a href=&quot;https://pages.github.com&quot;&gt;Github Pages&lt;/a&gt; so there&apos;s no hitting a database to pull back the relevant files.&lt;/p&gt;
+    <content type="html">&lt;p&gt;After doing my initial &lt;a href=&quot;/2015/08/30/myfirstpost.html&quot;&gt;post yesterday&lt;/a&gt; I realised it&apos;d be useful to have tags (or categories, whatever your preferred nomenclature) support. It&apos;s an easy way for a user to quickly find everything relating to, say, &lt;a href=&quot;/tag/pretzel&quot;&gt;Pretzel&lt;/a&gt; without having to read about &lt;a href=&quot;/tag/cats&quot;&gt;cats&lt;/a&gt;. How do we go about getting such a feature? Remeember that Pretzel is a static blog engine. Everything is generated offline on your computer and then uploaded to your host (in my case, &lt;a href=&quot;https://pages.github.com&quot;&gt;Github Pages&lt;/a&gt;) so there&apos;s no hitting a database to pull back the relevant files.&lt;/p&gt;
 &lt;p&gt;If you investigate a little bit you&apos;ll find that when you&apos;re viewing an individual post the template used to generate the static HTML is &lt;a href=&quot;https://github.com/MrMDavidson/mrmdavidson.github.io/blob/a3b3e198dbecbbe6e86893ab0276963eb694cf70/_layouts/post.html&quot;&gt;_layouts/post.html&lt;/a&gt; which seems to have some code relating to tags;&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;{% for tag in page.tags %}
     &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;/tag/{{ tag }}&amp;quot;&amp;gt;{{ tag }}&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;

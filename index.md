@@ -9,28 +9,31 @@ title : michaeldavidson.me
 			<div class="idea">
 				{% if forloop.first and post.layout == "post" %}
 					<h1><a href="{{ post.url }}">{{ post.title }}</a></h1>
-					<div class="postdate">{{ post.date | date: "%e %B, %Y"  }}
-						<ul>
-						{% for tag in post.tags %}
-							<li><a href="/tag/{{ tag }}">{{ tag }}</a></li>
-						{% endfor %}
-						</ul>
-					</div>
-					{{ post.content }}
-					<br />
-					<a href="{{ post.url}}#disqus_thread">Comments</a>
 				{% else %}
 					<h2><a class="postlink" href="{{ post.url }}">{{ post.title }}</a></h2>
-					<div class="postdate">{{ post.date | date: "%e %B, %Y"  }}
-						<ul>
-						{% for tag in post.tags %}
-							<li><a href="/tag/{{ tag }}">{{ tag }}</a></li>
-						{% endfor %}
-						</ul>
-					</div>
-					{{ post.content }}
-					<a href="{{ post.url }}#disqus_thread">Comments</a>
 				{% endif %}
+				{% if post.categories %}
+					<div>Posted under: 
+						{% for category in post.categories %}
+							<a href="/category/{{category}}">{{ category }}</a>{% if forloop.last == false %},{% endif %} 
+						{% endfor %}
+					</div>	
+				{% endif %}
+				{% if post.tags %}
+					<div>Tags: 
+						{% for tag in post.tags %}
+							<a href="/tag/{{tag}}">{{ tag }}</a>{% if forloop.last == false %},{% endif %} 
+						{% endfor %}
+					</div>
+				{% endif %}
+				<div class="postdate">
+					{{ post.date | date: "%e %B, %Y"  }}
+				</div>
+				<div>
+					{{ post.content }}
+				</div>
+				<br />
+				<a href="{{ post.url}}#disqus_thread">Comments</a>
 			</div>
 		</li>
     {% endfor %}

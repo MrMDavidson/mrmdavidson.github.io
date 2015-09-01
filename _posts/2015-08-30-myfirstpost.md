@@ -2,6 +2,7 @@
 layout: post
 title: "My First Post"
 comments: true
+categories: [ technology ]
 tags: [ pretzel, blog ]
 ---
 

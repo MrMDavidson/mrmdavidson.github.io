@@ -5,12 +5,23 @@ layout: layout
 <div class="entry-container">
 	<div class='entry'>
 		<h1> {{page.title}} </h1>
+		{% if page.categories %}
+			<div>Posted under: 
+				{% for category in page.categories %}
+					<a href="/category/{{category}}">{{ category }}</a>{% if forloop.last == false %},{% endif %} 
+				{% endfor %}
+			</div>	
+		{% endif %}
+		{% if page.tags %}
+			<div>Tags: 
+				{% for tag in page.tags %}
+					<a href="/tag/{{tag}}">{{ tag }}</a>{% if forloop.last == false %},{% endif %} 
+				{% endfor %}
+			</div>
+		{% endif %}
+
 		{% if page.includedate != false %}
-		<span class="postdate">{{ page.date | date: "%e %B, %Y"  }}
-			{% for tag in page.tags %}
-				<li><a href="/tag/{{ tag }}">{{ tag }}</a></li>
-			{% endfor %}
-		</span>
+		<span class="postdate">{{ page.date | date: "%e %B, %Y"  }}</span>
 		{% endif %}
 		{{ content }}
 	</div>

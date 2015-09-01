@@ -1,5 +1,6 @@
 exclude: [ generate.bat, Tools ]
 timezone: Australia/Melbourne
+permalink: /:year/:month/:day/:title
 pretzel: 
     engine: liquid
 default:

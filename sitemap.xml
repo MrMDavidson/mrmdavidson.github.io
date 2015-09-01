@@ -7,14 +7,14 @@
   <!-- Generated with pretzel -->
   
   <url>
-    <loc>http://domain/2015/08/31/tags.html</loc>
+    <loc>http://domain/2015/08/31/tags/</loc>
     <lastmod>2015-08-31T00:00:00+10:00</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.00</priority>
   </url>
   
   <url>
-    <loc>http://domain/2015/08/30/myfirstpost.html</loc>
+    <loc>http://domain/2015/08/30/myfirstpost/</loc>
     <lastmod>2015-08-30T00:00:00+10:00</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.00</priority>
@@ -24,7 +24,7 @@
   
 	
 	<url>
-		<loc>http://domain/C:/Code/mrmdavidson.github.io-pretzel/../mrmdavidson.github.io-master/about.html</loc>
+		<loc>http://domain/about/</loc>
 		<changefreq>daily</changefreq>
 		<priority>1.00</priority>
 	</url>
@@ -59,6 +59,14 @@
 	
 	<url>
 		<loc>http://domain/C:/Code/mrmdavidson.github.io-pretzel/../mrmdavidson.github.io-master/sitemap.xml</loc>
+		<changefreq>daily</changefreq>
+		<priority>1.00</priority>
+	</url>
+	
+  
+	
+	<url>
+		<loc>http://domain/category/technology/</loc>
 		<changefreq>daily</changefreq>
 		<priority>1.00</priority>
 	</url>

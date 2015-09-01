@@ -3,7 +3,7 @@
   <title>Feed Name</title>
   <link href="http://domain/"/>
   <link type="application/atom+xml" rel="self" href="http://domain/atom.xml"/>
-  <updated>2015-09-01T22:25:02.9547547+10:00</updated>
+  <updated>2015-09-02T00:49:09.26064+10:00</updated>
   <id>http://domain/</id>
   <author>
     <name>Author</name>
@@ -12,8 +12,8 @@
 
   
   <entry>
-    <id>http://domain//2015/08/31/tags.html</id>
-    <link type="text/html" rel="alternate" href="http://domain//2015/08/31/tags.html"/>
+    <id>http://domain//2015/08/31/tags/</id>
+    <link type="text/html" rel="alternate" href="http://domain//2015/08/31/tags/"/>
     <title>Tags?</title>
     <updated>2015-08-31T00:00:00+10:00</updated>
     <author>
@@ -112,8 +112,8 @@ layout: layout
   </entry>
   
   <entry>
-    <id>http://domain//2015/08/30/myfirstpost.html</id>
-    <link type="text/html" rel="alternate" href="http://domain//2015/08/30/myfirstpost.html"/>
+    <id>http://domain//2015/08/30/myfirstpost/</id>
+    <link type="text/html" rel="alternate" href="http://domain//2015/08/30/myfirstpost/"/>
     <title>My First Post</title>
     <updated>2015-08-30T00:00:00+10:00</updated>
     <author>

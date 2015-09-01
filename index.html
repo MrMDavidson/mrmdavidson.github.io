@@ -19,7 +19,7 @@
 				<div id="hometext"><a href="/" >michaeldavidson.me</a></div>
 				<div class="section">
 					<ul>
-						<li><a href="/about.html">about</a></li>
+						<li><a href="/about">about</a></li>
 						<li><a href="/">index</a></li>
 						<li><a href="http://twitter.com/mrmdavidson">@mrmdavidson</a></li>
 						<li><a href="https://github.com/MrMDavidson">github</a></li>
@@ -34,16 +34,28 @@
         <li>
             <div class="idea">
                 
-                    <h1><a href="/2015/08/31/tags.html">Tags?</a></h1>
-                    <div class="postdate">31 August, 2015
-                        <ul>
+                    <h1><a href="/2015/08/31/tags/">Tags?</a></h1>
+                
+                
+                    <div>Posted under: 
                         
-                            <li><a href="/tag/pretzel">pretzel</a></li>
+                            <a href="/category/technology">technology</a> 
                         
-                            <li><a href="/tag/blog">blog</a></li>
+                    </div>  
+                
+                
+                    <div>Tags: 
                         
-                        </ul>
+                            <a href="/tag/pretzel">pretzel</a>, 
+                        
+                            <a href="/tag/blog">blog</a> 
+                        
                     </div>
+                
+                <div class="postdate">
+                    31 August, 2015
+                </div>
+                <div>
                     <p>After doing my initial <a href="/2015/08/30/myfirstpost.html">post yesterday</a> I realised it'd be useful to have tags (or categories, whatever your preferred nomenclature) support. It's an easy way for a user to quickly find everything relating to, say, <a href="/tag/pretzel">Pretzel</a> without having to read about <a href="/tag/cats">cats</a>. How do we go about getting such a feature? Remeember that Pretzel is a static blog engine. Everything is generated offline on your computer and then uploaded to your host (in my case, <a href="https://pages.github.com">Github Pages</a>) so there's no hitting a database to pull back the relevant files.</p>
 <p>If you investigate a little bit you'll find that when you're viewing an individual post the template used to generate the static HTML is <a href="https://github.com/MrMDavidson/mrmdavidson.github.io/blob/a3b3e198dbecbbe6e86893ab0276963eb694cf70/_layouts/post.html">_layouts/post.html</a> which seems to have some code relating to tags;</p>
 <pre><code class="language-html">{% for tag in page.tags %}
@@ -133,25 +145,37 @@ layout: layout
 </code></pre>
 <p><img src="/img/posts/2015-08-31-tags/styled-tagged-posts.png" alt="Prettier styled posts" title="Prettier styled posts" /></p>
 <p>And that's about it! Have a look through the list of <a href="http://jekyllrb.com/docs/variables/">Liquid Variables</a> for other details you may wish to include on your listing page (such as the <code>post.date</code>). And finally don't forget you'll need to go through and create a corresponding <code>.md</code> file in <code>tag</code> for each tag you use on your site. In the future I'll look at seeing if this is something I can automate as I'm not one for doing something a computer will do much more reliably.</p>
-                    <br />
-                    <a href="/2015/08/31/tags.html#disqus_thread">Comments</a>
-                
+                </div>
+                <br />
+                <a href="/2015/08/31/tags/#disqus_thread">Comments</a>
             </div>
         </li>
     
         <li>
             <div class="idea">
                 
-                    <h2><a class="postlink" href="/2015/08/30/myfirstpost.html">My First Post</a></h2>
-                    <div class="postdate">30 August, 2015
-                        <ul>
+                    <h2><a class="postlink" href="/2015/08/30/myfirstpost/">My First Post</a></h2>
+                
+                
+                    <div>Posted under: 
                         
-                            <li><a href="/tag/pretzel">pretzel</a></li>
+                            <a href="/category/technology">technology</a> 
                         
-                            <li><a href="/tag/blog">blog</a></li>
+                    </div>  
+                
+                
+                    <div>Tags: 
                         
-                        </ul>
+                            <a href="/tag/pretzel">pretzel</a>, 
+                        
+                            <a href="/tag/blog">blog</a> 
+                        
                     </div>
+                
+                <div class="postdate">
+                    30 August, 2015
+                </div>
+                <div>
                     <p>Several years ago now Scott Hanselman wrote an blog post titled <a href="http://www.hanselman.com/blog/YourBlogIsTheEngineOfCommunity.aspx">Your Blog is the Engine of Community</a>. The basic premise of it, for those too lazy to read it,
 was that you should own your own content. Sites like Twitter and Facebook are intrinsically transient and, perhaps more importantly, owned by someone else. &quot;That makes sense!&quot; I thought. And so I had a look about on the internet
 came across <a href="https://pages.github.com/">Github Pages</a> had a quick play and... forgot about it. And then today a friend of mine was looking at ditching Wordpress for their own blog and asked if I had any suggestions. I gave a half
@@ -248,8 +272,9 @@ git push origin
 popd
 </code></pre>
 <p>This way once I'm finished tasting my blog locally I can just run <code>generate.bat</code> and seconds later everything is available to the public!</p>
-                    <a href="/2015/08/30/myfirstpost.html#disqus_thread">Comments</a>
-                
+                </div>
+                <br />
+                <a href="/2015/08/30/myfirstpost/#disqus_thread">Comments</a>
             </div>
         </li>
     

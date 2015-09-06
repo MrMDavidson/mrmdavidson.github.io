@@ -3,13 +3,133 @@
   <title>Feed Name</title>
   <link href="http://domain/"/>
   <link type="application/atom+xml" rel="self" href="http://domain/atom.xml"/>
-  <updated>2015-09-02T00:50:58.9041218+10:00</updated>
+  <updated>2015-09-06T15:58:26.1947203+10:00</updated>
   <id>http://domain/</id>
   <author>
     <name>Author</name>
     <email>Email</email>
   </author>
 
+  
+  <entry>
+    <id>http://domain//2015/09/06/sql-server-tricks/</id>
+    <link type="text/html" rel="alternate" href="http://domain//2015/09/06/sql-server-tricks/"/>
+    <title>SQL Server Tricks</title>
+    <updated>2015-09-06T00:00:00+10:00</updated>
+    <author>
+      <name>Author</name>
+      <uri>http://domain/</uri>
+    </author>
+    <content type="html">&lt;p&gt;Throughout my career I&apos;ve spent more than my fair share of time in the database layer. There&apos;s a current trent in the .Net world of just letting your ORM take care of everything in the data layer for you. I&apos;m a huge proponent of using an ORM for mapping (at work we&apos;re currently using StackExchange&apos;s &lt;a href=&quot;https://github.com/StackExchange/dapper-dot-net&quot;&gt;Dapper.net&lt;/a&gt;). However I&apos;ve always been a little wary of letting the ORM do everything for you. As such I thought I&apos;d jot down a few handy SQL Server tricks I&apos;ve picked up over the years.&lt;/p&gt;
+&lt;h3&gt;1. The Output Clause&lt;/h3&gt;
+&lt;p&gt;The &lt;a href=&quot;https://msdn.microsoft.com/en-us/library/ms177564.aspx&quot;&gt;&lt;code&gt;OUTPUT&lt;/code&gt; clause&lt;/a&gt; let&apos;s you execute a data modification statement and have it project a result set. In plain English that means that you can perform a &lt;code&gt;DELETE&lt;/code&gt;, &lt;code&gt;INSERT&lt;/code&gt; or &lt;code&gt;UPDATE&lt;/code&gt; &lt;strong&gt;and&lt;/strong&gt; have it return a resultset. This has been around since SQL Server 2008 but doesn&apos;t seem to get much attention. An example might be;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-SQL&quot;&gt;UPDATE  Customers
+SET     Archived = 1
+OUTPUT  DELETED.Id,
+        DELETED.EmailAddress
+WHERE   RecentlyLoggedIn = 0
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In one, atomic, operation this would mark all customer who have not recently logged in as archived as well as returning the customer id and email address for all those customers. I&apos;ve seen this often implemented as something along the lines of&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-SQL&quot;&gt;SELECT  C.Id,
+        C.EmailAddress
+FROM    Customers C
+WHERE   C.RecentlyLoggedIn = 0
+
+UPDATE  Customers
+SET     Archived = 1
+WHERE   RecentlyLoggedIn = 0
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;However, depending on your locking model applied, another process could come along and change the status of &lt;code&gt;RecentlyLoggedIn&lt;/code&gt; between the two statements. This won&apos;t happen with the original statement I provided. It also means that the entire operation can be rolled back as a transactional unit of work.&lt;/p&gt;
+&lt;p&gt;It&apos;s worth noting that with the &lt;code&gt;OUTPUT&lt;/code&gt; clause you get access to both an &lt;code&gt;INSERTED&lt;/code&gt; and a &lt;code&gt;DELETED&lt;/code&gt; psuedo-table to operate on. You can think of the &lt;code&gt;INSERTED&lt;/code&gt; table as the &amp;quot;new&amp;quot; view of the data after the operation has finished (Only applicable with &lt;code&gt;UPDATE&lt;/code&gt;, &lt;code&gt;INSERT&lt;/code&gt; and &lt;code&gt;MERGE&lt;/code&gt;) statements and the &lt;code&gt;DELETED&lt;/code&gt; table as the view before the operation was executed (Only applicable with the &lt;code&gt;UPDATE&lt;/code&gt;, &lt;code&gt;DELETE&lt;/code&gt; and &lt;code&gt;MERGE&lt;/code&gt; operation).&lt;/p&gt;
+&lt;h3&gt;2. &lt;code&gt;READPAST&lt;/code&gt; and &lt;code&gt;ROWLOCK&lt;/code&gt; locking hints&lt;/h3&gt;
+&lt;p&gt;Both of these &lt;a href=&quot;https://msdn.microsoft.com/en-us/library/ms187373.aspx&quot;&gt;locking hints&lt;/a&gt; have been available since SQL Server 2008 and work very well together.&lt;/p&gt;
+&lt;p&gt;First the &lt;code&gt;ROWLOCK&lt;/code&gt; hint tells SQL Server to, where possible, use a row level lock instead of a page or table lock. This means that instead of locking an entire table, or index page, SQL Server will minimise the locking to only the affected row(s).&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-SQL&quot;&gt;UPDATE  Customers WITH (ROWLOCK)
+SET     CustomerEmailed = 1
+WHERE   Archived = 1
+AND     CustomerEmailed = 0
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;READPAST&lt;/code&gt;, available since SQL Server 2008, instructs SQL Server that if a row in the dataset has a row level lock applied to skip past it. This can be very handy when performing any kind of queue based work. Suppose we have&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-SQL&quot;&gt;SELECT  C.Id,
+        C.Email
+FROM    Customers C WITH (READPAST)
+WHERE   Archived = 1
+AND     CustomerEmailed = 1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If this was executed whilst the &lt;code&gt;ROWLOCK&lt;/code&gt; example was executing it would only return those rows where &lt;code&gt;Archived = 1&lt;/code&gt; and &lt;code&gt;CustomerEmailed = 1&lt;/code&gt; was true &lt;em&gt;before&lt;/em&gt; the first transaction started executing. It&apos;s important to note that this means that any locked row is completely ignored from the resultset! Let me reiterate that; If a row is currently locked it will not be in the produced output, even though it would (once any locks are released) appear in the resultset. Depending on what you&apos;re doing this is very powerful... but if you&apos;re not aware of it you may introduce subtle, transient, bugs. So be careful.&lt;/p&gt;
+&lt;h3&gt;3. &lt;code&gt;RAISERROR ... WITH NOWAIT&lt;/code&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;a href=&quot;https://msdn.microsoft.com/en-us/library/ms178592.aspx&quot;&gt;&lt;code&gt;RAISERROR .. WITH NOWAIT&lt;/code&gt;&lt;/a&gt; let&apos;s you flush a message to SQL Server Management Studio immediately rather than waiting until the end of the batch. This is useful when you&apos;re testing locking to track which statement is causing the execution to block&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-SQL&quot;&gt;RAISERROR(&apos;Hello world&apos;, 0, 1) WITH NOWAIT
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;4. Testing Locks&lt;/h3&gt;
+&lt;p&gt;The final quick tip is how you can test locks. Getting things to run at just the right time can be very tricky and the application of appropriate locking hints is highly dependent on a number of factors (indexes involved, the query analyzer, foreign keys, the statement, etc). So when it comes to testing how locks interact with each other one of the simplest tools is the &lt;a href=&quot;https://msdn.microsoft.com/en-us/library/ms187331.aspx&quot;&gt;&lt;code&gt;WAITFOR DELAY&lt;/code&gt;&lt;/a&gt; expression. This makes SQL Server pause execution of your query until the time elapses. Eg. &lt;code&gt;WAITFOR DELAY &apos;0:00:10&apos;&lt;/code&gt; would wait for 10 seconds to elapse. Using this trick you can construct queries which emulate longer running tasks or concurrent operations.&lt;/p&gt;
+&lt;p&gt;To better illustrate all of this we&apos;ll create the simple table used throughout these examples and populate it&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-SQL&quot;&gt;CREATE TABLE Customers (
+    [Id] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
+    [Email] [varchar](250) NULL,
+    [Archived] [bit] NULL,
+    [CustomerEmailed] [bit] NULL,
+)
+GO
+
+INSERT INTO Customers (Email, Archived, CustomerEmailed)
+SELECT  &apos;user1@domain.com&apos;, 0, 0
+UNION ALL
+SELECT  &apos;user2@domain.com&apos;, 1, 1
+UNION ALL
+SELECT  &apos;user3@domain.com&apos;, 1, 0
+UNION ALL
+SELECT  &apos;user4@domain.com&apos;, 0, 1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&quot;/img/posts/2015-09-06-sql-server-tricks/sample-data.png&quot; alt=&quot;Sample Data&quot; title=&quot;Sample Data&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;Now we&apos;ll run two different queries. The first one mark any customers as emailed that have not yet been emailed but are archived. It&apos;ll then return this recordset to the calling code. You can imagine in an actual application exeucting this statement, looping over the resultset, and emailing the associated customers. To simulate the work of emailing the customer we&apos;ll make use of the &lt;code&gt;WAITFOR... DELAY&lt;/code&gt; statement we mentioned earlier.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-SQL&quot;&gt;BEGIN TRAN
+
+RAISERROR(&apos;Executing update&apos;, 0, 1) WITH NOWAIT
+
+UPDATE  Customers WITH (ROWLOCK)
+SET     CustomerEmailed = 1
+OUTPUT  INSERTED.Id,
+        INSERTED.Email
+WHERE   Archived = 1
+AND     CustomerEmailed = 0
+
+RAISERROR(&apos;Update finished&apos;, 0, 1) WITH NOWAIT
+
+WAITFOR DELAY &apos;00:00:10&apos;
+
+RAISERROR(&apos;Work finished&apos;, 0, 1) WITH NOWAIT
+
+ROLLBACK TRAN
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Go ahead and run this. After 10s you&apos;ll get the results. You may not see the actual result sets until the 10s delay has elapsed but if you switch to the &lt;code&gt;Messages&lt;/code&gt; tab instead of the &lt;code&gt;Results&lt;/code&gt; tab you&apos;ll see it straight away printint out the &amp;quot;Executing update&amp;quot; and &amp;quot;Update finished&amp;quot; messages. The second query we&apos;ll execute will select those customers who have been emailed.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-SQL&quot;&gt;BEGIN TRAN
+
+RAISERROR(&apos;Selecting with READPAST&apos;, 0, 1) WITH NOWAIT
+
+SELECT  *
+FROM    Customers WITH (READPAST)
+WHERE   CustomerEmailed = 1
+
+RAISERROR(&apos;Selecting without READPAST&apos;, 0, 1) WITH NOWAIT
+
+SELECT  *
+FROM    Customers
+WHERE   CustomerEmailed = 1
+
+RAISERROR(&apos;Executing update&apos;, 0, 1) WITH NOWAIT
+
+ROLLBACK TRAN
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If we execute this at the same time as the first query you will immediately get back the list of customers. And then, once the first query has finished, you&apos;ll get the second resultset. One thing to note is that if the first transaction committed you would get back &lt;strong&gt;3&lt;/strong&gt; customers in the second resultset but still only &lt;strong&gt;2&lt;/strong&gt; customer in the first resultset.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/posts/2015-09-06-sql-server-tricks/running-queries.png&quot; alt=&quot;Whilst executing&quot; title=&quot;Whilst executing&quot; /&gt;
+Whilst both queries are executing you&apos;ll see something output something like this. Note that the lefthand side has generated its resultset as has the &lt;code&gt;READPAST&lt;/code&gt; query on the right hand side. But the second resultset on the right hasn&apos;t generated yet.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/posts/2015-09-06-sql-server-tricks/ran-queries.png&quot; alt=&quot;Finished executing&quot; title=&quot;Finished executing&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;Once the &lt;code&gt;WAITFOR DELAY&lt;/code&gt; has finished (and any work is committed or rolled back) the second resultset on the right will generate. You can verify that by running &lt;code&gt;sp_who2 &apos;active&apos;&lt;/code&gt; while both are running.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/posts/2015-09-06-sql-server-tricks/blocked-by.png&quot; alt=&quot;sp_who2&quot; title=&quot;Blocked By&quot; /&gt;
+Here we can see that the right hand query, SPID 52, is currently blocked by SPID 53, which is the left hand side.&lt;/p&gt;
+&lt;p&gt;Hope you find these little tips helpful!&lt;/p&gt;</content>
+  </entry>
   
   <entry>
     <id>http://domain//2015/08/31/tags/</id>

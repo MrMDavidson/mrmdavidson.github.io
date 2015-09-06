@@ -7,6 +7,13 @@
   <!-- Generated with pretzel -->
   
   <url>
+    <loc>http://domain/2015/09/06/sql-server-tricks/</loc>
+    <lastmod>2015-09-06T00:00:00+10:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.00</priority>
+  </url>
+  
+  <url>
     <loc>http://domain/2015/08/31/tags/</loc>
     <lastmod>2015-08-31T00:00:00+10:00</lastmod>
     <changefreq>daily</changefreq>
@@ -32,7 +39,7 @@
   
 	
 	<url>
-		<loc>http://domain/C:/Code/mrmdavidson.github.io-pretzel/../mrmdavidson.github.io-master/atom.xml</loc>
+		<loc>http://domain/D:/Code/Blog/mrmdavidson.github.io-pretzel/../mrmdavidson.github.io-master/atom.xml</loc>
 		<changefreq>daily</changefreq>
 		<priority>1.00</priority>
 	</url>
@@ -42,7 +49,7 @@
   
 	
 	<url>
-		<loc>http://domain/C:/Code/mrmdavidson.github.io-pretzel/../mrmdavidson.github.io-master/index.html</loc>
+		<loc>http://domain/D:/Code/Blog/mrmdavidson.github.io-pretzel/../mrmdavidson.github.io-master/index.html</loc>
 		<changefreq>daily</changefreq>
 		<priority>1.00</priority>
 	</url>
@@ -50,7 +57,7 @@
   
 	
 	<url>
-		<loc>http://domain/C:/Code/mrmdavidson.github.io-pretzel/../mrmdavidson.github.io-master/rss.xml</loc>
+		<loc>http://domain/D:/Code/Blog/mrmdavidson.github.io-pretzel/../mrmdavidson.github.io-master/rss.xml</loc>
 		<changefreq>daily</changefreq>
 		<priority>1.00</priority>
 	</url>
@@ -58,7 +65,7 @@
   
 	
 	<url>
-		<loc>http://domain/C:/Code/mrmdavidson.github.io-pretzel/../mrmdavidson.github.io-master/sitemap.xml</loc>
+		<loc>http://domain/D:/Code/Blog/mrmdavidson.github.io-pretzel/../mrmdavidson.github.io-master/sitemap.xml</loc>
 		<changefreq>daily</changefreq>
 		<priority>1.00</priority>
 	</url>
@@ -97,6 +104,14 @@
 	
   
 	
+  
+	
+  
+	
+  
+	
+  
+	
 	<url>
 		<loc>http://domain/tag/blog/</loc>
 		<changefreq>daily</changefreq>
@@ -107,6 +122,14 @@
 	
 	<url>
 		<loc>http://domain/tag/pretzel/</loc>
+		<changefreq>daily</changefreq>
+		<priority>1.00</priority>
+	</url>
+	
+  
+	
+	<url>
+		<loc>http://domain/tag/sql/</loc>
 		<changefreq>daily</changefreq>
 		<priority>1.00</priority>
 	</url>

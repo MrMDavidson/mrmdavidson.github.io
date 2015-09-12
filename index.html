@@ -34,7 +34,64 @@
         <li>
             <div class="idea">
                 
-                    <h1><a href="/2015/09/06/sql-server-tricks/">SQL Server Tricks</a></h1>
+                    <h1><a href="/2015/09/12/the-curse-of-the-evergreen-web/">The Curse of the Evergreen Web</a></h1>
+                
+                
+                    <div>Posted under: 
+                        
+                            <a href="/category/technology">technology</a> 
+                        
+                    </div>  
+                
+                
+                    <div>Tags: 
+                        
+                            <a href="/tag/web">web</a> 
+                        
+                    </div>
+                
+                <div class="postdate">
+                    12 September, 2015
+                </div>
+                <div>
+                    <p>With the release of Windows 10 Microsoft introduced a new browser known as Edge. It would free us web developers from having to support IE 12 in 10 years time like we do with IE6 now. From a release management perspective this isn't revolutionary. Firefox and Chrome have been doing this for years. Most users of either of these browsers wouldn't have a clue what particular version of those browsers they're on. (Don't believe me? Quick, talk to a colleague, a friend, a relative and ask them if they're running Chrome 44 or Chrome 45. I'll wait...) In many ways this is a great thing. It's something Scott Hanselman refers to as <a href="http://www.hanselman.com/blog/TheEvergreenWeb.aspx">The Evergreen Web</a>. In the article Scott talks about the important of compatibility modes. When most developers think of browsers and compatibility modes they think rendering engines. However recently Chrome 45 was released and it made me realise there's a curse to the &quot;Evergreen Web&quot; - we developers seem to think it'll only ever mean things will get better. But humans write software and humans make mistakes. So bugs will ineveitably be introduced into the latest versions of browsers. Bugs that will break existing, well documented, standardised behaviour.</p>
+<p>A little bit of background here. Many years ago the developers of the HTTP specification realised that connection speeds aren't infinite, that time outs happen, connections drop, and that resources can be large. So they implemented something called range requests and responses. When your browser talks to a server it tells the server &quot;Hey! I want all of this resource!&quot; it does this by using a request header of <code>Range: bytes=0-</code>. This tells the server that the web browser knows about range requests and it's currently requesting the range 0 to the end of the file. If the resource is hosted on even a remotely modern web server the server will respond with a slightly different response to normal. For one it will return a response code of <code>206 Partial Content</code> instead of a standard <code>200 OK</code> response. Additionally you'll see headers something like;</p>
+<pre><code>Accept-Ranges: bytes
+Content-Length: 1234
+Content-Range: bytes 0-1233/1234
+</code></pre>
+<p>This tells the web browser &quot;FYI: I can accept byte ranges! Anyway, this file content is 1234 bytes long. And this response is the range of bytes from 0-1233 (for a length of 1234)!&quot;. The client goes about it's merry way and starts consuming the response from the server. But, alas, alark, after byte 400 your internet connection dies! A few moments later it comes back up and you try downloading that same file. Instead of requesting the entire thing your browser, knowing that the resource came from a server that supports range requests/responses, will alter the request for the resource. This time when it requests the resource it'll insert a header <code>Range: bytes=400-1233</code>. Now when the server receives this it'll know to skip the first 400 bytes. It'll respond with another <code>206 Partial Content</code> response with headers akin to;</p>
+<pre><code>Accept-Ranges: bytes
+Content-Length: 834
+Content-Range: bytes 400-1233/1234
+</code></pre>
+<p>Then your browser knows when re-assembling the file that this response goes on the end of its prior response from the server and voila! You have the entire file without having to request the entire thing again. In our simplistic example we're talking about saving a few hundred bytes and, well, who cares? But imagine the file wasn't 1234 bytes. What if it was 100mb? 1,000mb? 4,000mb? And what if you were on a slow connection? Or a connection where you pay for data? It starts to become a pretty useful feature.</p>
+<p>But, that's not all, this can be combined with other great &quot;modern&quot; features. Let's say I have an audio file on my webpage. I hear there's sites out <a href="http://www.soundcloud.com">there</a> that do this kind of craziness. Now I click play on an MP3 but I've already heard the first half of it so I skip halfway through the file. A smart browser can look at the response from the server and make an educated guess that if the user has clicked halfway through the MP3 then it can terminate the current request and just request from the halfway point of the file. In fact, I have such an example of this happening...</p>
+<p><img src="/img/posts/2015-09-12-the-curse-of-the-evergreen-web/chrome-44-206-behaviour.gif" alt="Soundcloud Partial Response" title="Partial Responses" /></p>
+<p>Here I am listening to Australian comedian <a href="http://www.wilanderson.com.au/">Wil Anderson</a>'s podcast <a href="https://soundcloud.com/tofop">TOFOP on Soundcloud</a>. When I hit play my browser (Chrome 44, here) starts downloading and playing the MP3. When I skip to the end of the MP3 it terminates the existing download and starts a new download at my requested position. This is great - I'm not downloading the ~40mb of data inbetween those points that I don't care about and I hear audio at the new point almost instantly.</p>
+<p><img src="/img/posts/2015-09-12-the-curse-of-the-evergreen-web/chrome-44-initial-request.png" alt="Soundcloud Initial Request/Response" title="Initial Request/Response" /></p>
+<p>Looking through the response details you can see that my browser has indicated that it handles ranges and that the server has responded with a <code>206 Partial Content</code> and indicated the range that it has served.</p>
+<p><img src="/img/posts/2015-09-12-the-curse-of-the-evergreen-web/chrome-44-subsequent-request.png" alt="Soundcloud Subsequent Request/Response" title="Subsequent Request/Response" /></p>
+<p>Once I click later in the file we can see that my browser has made the second request with a specific <code>Range: bytes=...</code> request header. The server has responded with the appropriate range.</p>
+<p>Now, what does any of this have to do with the &quot;Evergreen Web&quot; ? Well all of those requests were made whilst I was on Chrome 44. Now let's try the same thing on Chrome 45.</p>
+<p><img src="/img/posts/2015-09-12-the-curse-of-the-evergreen-web/chrome-45-206-behaviour.gif" alt="Soundcloud No Partial Responses (FTTP)" title="No Partial Responses (FTTP)" /></p>
+<p>Notice now when I through the file that the pause/play button has turned into a spinner? And that there is no termination of the connection and creation of a new request? I'm on a pretty quick connection where I am so it's not too bad too download the interim ~45mb of data. But it does interupt my listening experience. Let's just say that instead of being on a Fibre to the Premises connection I was on WiFi...</p>
+<p><img src="/img/posts/2015-09-12-the-curse-of-the-evergreen-web/chrome-45-wifi-206-behaviour.gif" alt="Soundcloud No Partial Responses (WiFi)" title="No Partial Responses (WiFi)" /></p>
+<p>Here I've used Chrome's bandwidth throttling to simulate a WiFi connection (Still a rather good connection, mind!) and notice how much longer I have to wait before the pause/play button stops spinning? Now imagine I'm on a 3G connection. Or a DSL2 connection (which I tried to show you but my screen recording software actually crashed because it took too long).</p>
+<p>Ignoring the horrible user experience here there's also a monetary cost. As a consumer you might be spending additional money (or time) to download that unwanted data. And if you're hosting resources? Well you just threw those 45mb of data to a client that didn't even want them. Chrome 45 was only released on the <a href="https://en.wikipedia.org/wiki/Google_Chrome_release_history">1st of September</a> but in those two weeks it already has <a href="http://gs.statcounter.com/#browser_version-ww-daily-20150901-20150911-bar">~23.93% of the browser market share</a>. That's a lot of users potentially wasting a lot of data.</p>
+<p>So the Evergreen Web isn't just some amazing blessing for us web developers. It can have very real impacts. From user experiences to financial impacts. I should point out that this problem is only present in Chrome 45 when requesting MP3s. And it was all done as part of a bug fix that meant that Chrome &lt; 45 required <a href="https://code.google.com/p/chromium/issues/detail?id=397365">XING/INFO headers even on CBR MP3s to seek</a>. Maybe for most people it's not a huge problem but I just spent two days playing around with potential work arounds. The Chrome's team response to this is that they'll have it <a href="https://code.google.com/p/chromium/issues/detail?id=530043#c10">fixed for Chromium 47</a>. I'm not 100% sure on the cycle between Chrome and Chromium but Chromium 45 was branched on <a href="https://www.chromium.org/developers/calendar">July 10th</a> and Chrome 45 got released on the <a href="https://en.wikipedia.org/wiki/Google_Chrome_release_history">1st of September</a>. Chromium 47 is scheduled to be branched on <a href="https://www.chromium.org/developers/calendar">October 2nd</a> - if there's a similar branch to release gap we'll be living with this bug until December. That's a lot of wasted time and money in the interim.</p>
+<p>In the mean time if you're prone to wanting to skip through MP3s on the web you have a few options; you can try using AAC files instead, you can use Chrome 44, or you can use another browser.</p>
+<p>Note: If you a developer affected by this and you manage to find a work around please let me know!</p>
+                </div>
+                <br />
+                <a href="/2015/09/12/the-curse-of-the-evergreen-web/#disqus_thread">Comments</a>
+            </div>
+        </li>
+    
+        <li>
+            <div class="idea">
+                
+                    <h2><a class="postlink" href="/2015/09/06/sql-server-tricks/">SQL Server Tricks</a></h2>
                 
                 
                     <div>Posted under: 

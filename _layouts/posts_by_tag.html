@@ -2,23 +2,36 @@
 layout: layout
 active_menu_item: tag 
 ---
-
-<h1>Posts  by tag {{ page.tag }}</h1>
-<div>
-    {% assign HasTag = false %}
-    
-    {% for tag in site.tags %}
-        {% if tag.Name ==  page.tag %}
-            {% assign HasTag = true %}
-            {% for post in tag.Posts %}
-                <p><a href="{{ post.url }}">{{post.title}}</a> on {{ post.date | date: '%Y-%m-%d' }}</p>
-                <p>{{post.content | truncate: 200 }}</p>
-                <p><a href="{{ post.url }}">read more...</a></p>
-            {% endfor %}
+<div class="row">
+    <div class="col-md-8">
+        <h1>Posts by tag {{ page.tag }}</h1>
+        {% assign HasTag = false %}
+        
+        {% for tag in site.tags %}
+            {% if tag.Name ==  page.tag %}
+                {% assign HasTag = true %}
+                {% for post in tag.Posts %}
+                    <h2><a href="{{ post.url }}">{{post.title}}</a>
+                        {% if post.includedate != false %}
+                            <small>{{ post.date | date: '%Y-%m-%d' }}</small>
+                        {% endif %}
+                    </h2>
+                    <p>{{post.content | truncate: 1000 }}</p>
+                    <p class="text-right"><a href="{{ post.url }}">read more...</a></p>
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+        
+        {% if HasTag == false %}
+            <p>There's no posts for "{{ page.tag }}"!</p>
         {% endif %}
-    {% endfor %}
-    
-    {% if HasTag == false %}
-        <p>There's no posts for "{{ page.tag }}"!</p>
-    {% endif %}
+    </div>
+    <div class="col-md-4">
+        <h4>Other Tags</h4>
+        {% for tag in site.tags %}
+            {% if tag.Name != page.tag %}
+                <h5><a href="/tag/{{tag.Name}}">{{tag.Name | capitalize}}</a>&nbsp;<span class="badge">{{ tag.Posts.size}}</span></h5>
+            {% endif %}
+        {% endfor %}
+    </div>
 </div>

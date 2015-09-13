@@ -4,6 +4,7 @@ title: About
 comments: false
 includedate: false
 permalink: /about
+active_menu_item: about 
 ---
 
 I'm a software engineer that spends far too much time poking at computers to see what happens. In the past I've written software in C/C++, Assembly, Perl, Python, VBScript, VB, Java, etc but these days I tend to stick to the .Net stack

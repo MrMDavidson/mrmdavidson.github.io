@@ -3,7 +3,7 @@
   <title>Feed Name</title>
   <link href="http://domain/"/>
   <link type="application/atom+xml" rel="self" href="http://domain/atom.xml"/>
-  <updated>2015-09-12T17:08:59.1739523+10:00</updated>
+  <updated>2015-09-14T00:59:31.8454335+10:00</updated>
   <id>http://domain/</id>
   <author>
     <name>Author</name>
@@ -279,13 +279,8 @@ layout: layout
       <name>Author</name>
       <uri>http://domain/</uri>
     </author>
-    <content type="html">&lt;p&gt;Several years ago now Scott Hanselman wrote an blog post titled &lt;a href=&quot;http://www.hanselman.com/blog/YourBlogIsTheEngineOfCommunity.aspx&quot;&gt;Your Blog is the Engine of Community&lt;/a&gt;. The basic premise of it, for those too lazy to read it,
-was that you should own your own content. Sites like Twitter and Facebook are intrinsically transient and, perhaps more importantly, owned by someone else. &amp;quot;That makes sense!&amp;quot; I thought. And so I had a look about on the internet
-came across &lt;a href=&quot;https://pages.github.com/&quot;&gt;Github Pages&lt;/a&gt; had a quick play and... forgot about it. And then today a friend of mine was looking at ditching Wordpress for their own blog and asked if I had any suggestions. I gave a half
-hearted reply about something like &lt;a href=&quot;https://pages.github.com/&quot;&gt;Github Pages&lt;/a&gt; and then... thought about it... and thought I should finally get my act together and finish playing with them myself.&lt;/p&gt;
-&lt;p&gt;My initial issue last time I looked into Github Pages was that they run &lt;a href=&quot;http://jekyllrb.com/&quot;&gt;Jekyll&lt;/a&gt;. Which isn&apos;t a bad thing, it&apos;s a nice bit of software, but as a Windows developer it seemed like a bunch of things I&apos;ve only
-had passing exposure to. I had a look for other static blog engines and came across &lt;a href=&quot;http://code52.org/pretzel.html&quot;&gt;Pretzel&lt;/a&gt;. Like Jekyll Pretzel generates a static blog for you from &lt;a href=&quot;http://daringfireball.net/projects/markdown/&quot;&gt;Markdown&lt;/a&gt;
-however unlike Jekyll it&apos;s written in .Net and feels more &amp;quot;natural&amp;quot; to a C# developer like myself. I did, however, have a few minor issues along the way, so I figured I&apos;d kill two birds with one stone and write about them.&lt;/p&gt;
+    <content type="html">&lt;p&gt;Several years ago now Scott Hanselman wrote a blog post titled &lt;a href=&quot;http://www.hanselman.com/blog/YourBlogIsTheEngineOfCommunity.aspx&quot;&gt;Your Blog is the Engine of Community&lt;/a&gt;. The basic premise of it, for those too lazy to read it, was that you should own your own content. Sites like Twitter and Facebook are intrinsically transient and, perhaps more importantly, owned by someone else. &amp;quot;That makes sense!&amp;quot; I thought. And so I had a look about on the internet came across &lt;a href=&quot;https://pages.github.com/&quot;&gt;Github Pages&lt;/a&gt; had a quick play and... forgot about it. And then today a friend of mine was looking at ditching Wordpress for their own blog and asked if I had any suggestions. I gave a half hearted reply about something like &lt;a href=&quot;https://pages.github.com/&quot;&gt;Github Pages&lt;/a&gt; and then... thought about it... and thought I should finally get my act together and finish playing with them myself.&lt;/p&gt;
+&lt;p&gt;My initial issue last time I looked into Github Pages was that they run &lt;a href=&quot;http://jekyllrb.com/&quot;&gt;Jekyll&lt;/a&gt;. Which isn&apos;t a bad thing, it&apos;s a nice bit of software, but as a Windows developer it seemed like a bunch of things I&apos;ve only had passing exposure to. I had a look for other static blog engines and came across &lt;a href=&quot;http://code52.org/pretzel.html&quot;&gt;Pretzel&lt;/a&gt;. Like Jekyll Pretzel generates a static blog for you from &lt;a href=&quot;http://daringfireball.net/projects/markdown/&quot;&gt;Markdown&lt;/a&gt; however unlike Jekyll it&apos;s written in .Net and feels more &amp;quot;natural&amp;quot; to a C# developer like myself. I did, however, have a few minor issues along the way, so I figured I&apos;d kill two birds with one stone and write about them.&lt;/p&gt;
 &lt;h2&gt;1.  Getting Pretzel&lt;/h2&gt;
 &lt;p&gt;Probably the easiest way to grab Pretzel is actually from &lt;a href=&quot;http://chocolatey.org&quot;&gt;Chocolatey&lt;/a&gt;. It&apos;s listed as &lt;a href=&quot;https://chocolatey.org/packages/pretzel&quot;&gt;Pretzel&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;This&apos;d be as simple as;&lt;/p&gt;
@@ -335,17 +330,14 @@ pretzel.exe bake
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&quot;/img/posts/2015-08-30-myfirstpost/pretzel-baking.png&quot; alt=&quot;Pretzel Baking&quot; title=&quot;Pretzel Baking&quot; /&gt;&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;Milliseconds later it&apos;ll have finished its work.&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;Now inside your repository you&apos;ll have an &lt;code&gt;_site&lt;/code&gt; directory. This is a static build of your site (Note: Anything starting with &lt;code&gt;_&lt;/code&gt; is ignored by Jekyll and Pretzel by convention). You can point your browser here and everything
-should work. But if you push this to your repository it won&apos;t have the desired results. What we&apos;re going to do is place a &amp;quot;.nojekyll&amp;quot; file in our directory - this is an instruction to Github to not run Jekyll on this repository.
-I know this seems counter intuitive, but trust me.&lt;/p&gt;
+&lt;p&gt;Now inside your repository you&apos;ll have an &lt;code&gt;_site&lt;/code&gt; directory. This is a static build of your site (Note: Anything starting with &lt;code&gt;_&lt;/code&gt; is ignored by Jekyll and Pretzel by convention). You can point your browser here and everything should work. But if you push this to your repository it won&apos;t have the desired results. What we&apos;re going to do is place a &amp;quot;.nojekyll&amp;quot; file in our directory - this is an instruction to Github to not run Jekyll on this repository. I know this seems counter intuitive, but trust me.&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&quot;language-dos&quot;&gt;echo &amp;quot;&amp;quot; &amp;gt; .nojekyll
 git add .nojekyll
 git commit -am &amp;quot;Opt out of Jekyll generation&amp;quot;
 git push
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Now if you visit your lovely blog... it&apos;ll be completely broken. How is this helpful? Stay with me here!&lt;/p&gt;
-&lt;p&gt;What we&apos;re going to do is create a new branch. &lt;a href=&quot;https://github.com/MrMDavidson/mrmdavidson.github.io/tree/master&quot;&gt;Master&lt;/a&gt; will be used for the generated content of the site. And our new branch, say, &lt;a href=&quot;https://github.com/MrMDavidson/mrmdavidson.github.io/tree/pretzel&quot;&gt;Pretzel&lt;/a&gt;
-will be used to store our working blog. This way both our blog &amp;quot;data&amp;quot; and our generated site is under source control.&lt;/p&gt;
+&lt;p&gt;What we&apos;re going to do is create a new branch. &lt;a href=&quot;https://github.com/MrMDavidson/mrmdavidson.github.io/tree/master&quot;&gt;Master&lt;/a&gt; will be used for the generated content of the site. And our new branch, say, &lt;a href=&quot;https://github.com/MrMDavidson/mrmdavidson.github.io/tree/pretzel&quot;&gt;Pretzel&lt;/a&gt; will be used to store our working blog. This way both our blog &amp;quot;data&amp;quot; and our generated site is under source control.&lt;/p&gt;
 &lt;p&gt;To avoid confusion we&apos;ll create two new copies of the repository...&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&quot;language-dos&quot;&gt;git clone https://github.com/MrMDavidson/mrmdavidson.github.io mrmdavidson.github.io-blog
 git clone https://github.com/MrMDavidson/mrmdavidson.github.io mrmdavidson.github.io-generated
@@ -353,8 +345,7 @@ cd mrmdavidson.github.io-blog
 git checkout -B pretzel
 git push origin
 &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Now what we&apos;ll do is create blog posts in the &lt;code&gt;mrmdavidson.github.io-blog&lt;/code&gt; directory which pushes to a &amp;quot;Pretzel&amp;quot; branch. Once we&apos;ve finished tasting these we can generate the static content into master.
-Let&apos;s start by cleaning master. You&apos;ll want to delete from git everything in here but your &lt;code&gt;.nojekyll&lt;/code&gt; file. Once you&apos;ve done that...&lt;/p&gt;
+&lt;p&gt;Now what we&apos;ll do is create blog posts in the &lt;code&gt;mrmdavidson.github.io-blog&lt;/code&gt; directory which pushes to a &amp;quot;Pretzel&amp;quot; branch. Once we&apos;ve finished tasting these we can generate the static content into master. Let&apos;s start by cleaning master. You&apos;ll want to delete from git everything in here but your &lt;code&gt;.nojekyll&lt;/code&gt; file. Once you&apos;ve done that...&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&quot;language-dos&quot;&gt;cd mrmdavidson.github.io-blog
 pretzel.exe bake --destination ..\mrmdavidson.github.io-generated\
 &lt;/code&gt;&lt;/pre&gt;

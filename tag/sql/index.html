@@ -1,59 +1,154 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		
+
 		<head>
+		<meta charset="utf-8">
+    	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+    	<meta name="viewport" content="width=device-width, initial-scale=1">
+    			
 		<meta content="en-au" http-equiv="Content-Language" />
 		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
 		<link href="/rss.xml" type="application/rss+xml" rel="alternate" title="Blog Feed" />
 		<link href="/atom.xml" type="application/atom+xml" rel="alternate" title="Blog Feed" />
-		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
 		<title></title>
+
+		
+		<!--Bootstrap-->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">		
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+
 		<link rel="stylesheet" type="text/css" href="/css/style.css" />
 		<link rel="stylesheet" href="//cdn.jsdelivr.net/highlight.js/8.4/styles/default.min.css">
 		<link rel="shortcut icon" href="/img/favicon.ico" />
 	</head>
 
-	<body>
-		<div id="container">
-			<div id="side">
-				<a href="/" id="home" title="home" alt="home"><img src="/img/logo.png" alt="michaeldavidson.me" /></a>
-				<div id="hometext"><a href="/" >michaeldavidson.me</a></div>
-				<div class="section">
-					<ul>
-						<li><a href="/about">about</a></li>
-						<li><a href="/">index</a></li>
-						<li><a href="http://twitter.com/mrmdavidson">@mrmdavidson</a></li>
-						<li><a href="https://github.com/MrMDavidson">github</a></li>
-						<li><a href="mailto:me@michaeldavidson.me">me@michaeldavidson.me</a></li>
-						<li><a href="/rss.xml"><img src="/img/25.png" /> feed</a></li>
-					</ul>
+	<body role="document">
+		<!--<div class="blog-masthead">-->
+			<!-- Fixed navbar -->
+			<nav id="top" class="navbar navbar-inverse navbar-static-top">
+				<div class="container">
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+							<span class="sr-only">Toggle navigation</span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+						<span class="navbar-brand">
+							<a href="/"><img src="/img/logo-mini.png" alt="michaeldavidson.me" /></a>
+						</span>
+						<a class="navbar-brand" href="/">michaeldavidson.me</a>
+					</div>
+					
+					<div id="navbar" class="navbar-collapse collapse">
+						<ul class="nav navbar-nav">
+							<li class=""><a href="/">Home</a></li>
+							<li class=""><a href="/about">About</a></li>
+	
+							<!--Category Menu-->
+							<li class=" dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">By Category <span class="caret"></span></a>
+								<ul class="dropdown-menu">
+									
+										<li class=""><a href="/category/technology">Technology <span class="badge">4</span></a></li>
+									
+								</ul>
+							</li>
+							
+							
+							<!--Tag Menu-->
+							<li class="active dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">By Tags <span class="caret"></span></a>
+								<ul class="dropdown-menu">
+									
+										<li class=""><a href="/tag/blog">Blog <span class="badge">2</span></a></li>
+									
+										<li class=""><a href="/tag/pretzel">Pretzel <span class="badge">2</span></a></li>
+									
+										<li class="active"><a href="/tag/sql">Sql <span class="badge">1</span></a></li>
+									
+										<li class=""><a href="/tag/web">Web <span class="badge">1</span></a></li>
+									
+								</ul>
+							</li>
+						</ul>
+					</div><!--/.nav-collapse -->
 				</div>
-			</div>
-			<div id="content">
-				<h1>Posts  by tag sql</h1>
-<div>
-    
-    
-    
+			</nav>
+		<!--</div>-->
+		
+		<div class="container">
+			<div class="row">
+    <div class="col-md-8">
+        <h1>Posts by tag sql</h1>
         
-    
         
-    
         
             
-            
-                <p><a href="/2015/09/06/sql-server-tricks/">SQL Server Tricks</a> on 2015-09-06</p>
-                <p><p>Throughout my career I've spent more than my fair share of time in the database layer. There's a current trent in the .Net world of just letting your ORM take care of everything in the data laye...</p>
-                <p><a href="/2015/09/06/sql-server-tricks/">read more...</a></p>
+        
             
         
-    
+            
+                
+                
+                    <h2><a href="/2015/09/06/sql-server-tricks/">SQL Server Tricks</a>
+                        
+                            <small>2015-09-06</small>
+                        
+                    </h2>
+                    <p><p>Throughout my career I've spent more than my fair share of time in the database layer. There's a current trent in the .Net world of just letting your ORM take care of everything in the data layer for you. I'm a huge proponent of using an ORM for mapping (at work we're currently using StackExchange's <a href="https://github.com/StackExchange/dapper-dot-net">Dapper.net</a>). However I've always been a little wary of letting the ORM do everything for you. As such I thought I'd jot down a few handy SQL Server tricks I've picked up over the years.</p>
+<h3>1. The Output Clause</h3>
+<p>The <a href="https://msdn.microsoft.com/en-us/library/ms177564.aspx"><code>OUTPUT</code> clause</a> let's you execute a data modification statement and have it project a result set. In plain English that means that you can perform a <code>DELETE</code>, <code>INSERT</code> or <code>UPDATE</code> <strong>and</strong> have it return a resultset. This has been around since SQL Server 2008 but doesn't seem ...</p>
+                    <p class="text-right"><a href="/2015/09/06/sql-server-tricks/">read more...</a></p>
+                
+            
         
-    
-    
-    
+            
+        
+        
+        
+    </div>
+    <div class="col-md-4">
+        <h4>Other Tags</h4>
+        
+            
+                <h5><a href="/tag/blog">Blog</a>&nbsp;<span class="badge">2</span></h5>
+            
+        
+            
+                <h5><a href="/tag/pretzel">Pretzel</a>&nbsp;<span class="badge">2</span></h5>
+            
+        
+            
+        
+            
+                <h5><a href="/tag/web">Web</a>&nbsp;<span class="badge">1</span></h5>
+            
+        
+    </div>
 </div>
-			</div>
 		</div>
+
+		<footer>
+			<ul class="list-inline">
+				<li><a href="https://twitter.com/mrmdavidson">@mrmdavidson</a></li>
+				<li><a href="https://github.com/MrMDavidson">Github</a></li>
+				<li><a href="http://stackoverflow.com/users/150728/mrmdavidson">StackOverflow</a></li>
+				<li><a href="mailto:me@michaeldavidson.me">me@michaeldavidson.me</a></li>
+				<li><a href="/rss.xml"><img src="/img/25.png" />&nbsp;RSS feed</a></li>
+			</ul>
+			
+			<p><a href="#top">Back to top</a></p>
+		</footer>
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+		
+		<!-- Bootstrap -->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>	
+		
 		<script src="//cdn.jsdelivr.net/highlight.js/8.4/highlight.min.js"></script>
 		<script>hljs.initHighlightingOnLoad();</script>
 		

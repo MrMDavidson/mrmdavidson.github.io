@@ -1,56 +1,119 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		
+
 		<head>
+		<meta charset="utf-8">
+    	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+    	<meta name="viewport" content="width=device-width, initial-scale=1">
+    			
 		<meta content="en-au" http-equiv="Content-Language" />
 		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
 		<link href="/rss.xml" type="application/rss+xml" rel="alternate" title="Blog Feed" />
 		<link href="/atom.xml" type="application/atom+xml" rel="alternate" title="Blog Feed" />
-		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
 		<title>The Curse of the Evergreen Web</title>
+
+		
+		<!--Bootstrap-->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">		
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+
 		<link rel="stylesheet" type="text/css" href="/css/style.css" />
 		<link rel="stylesheet" href="//cdn.jsdelivr.net/highlight.js/8.4/styles/default.min.css">
 		<link rel="shortcut icon" href="/img/favicon.ico" />
 	</head>
 
-	<body>
-		<div id="container">
-			<div id="side">
-				<a href="/" id="home" title="home" alt="home"><img src="/img/logo.png" alt="michaeldavidson.me" /></a>
-				<div id="hometext"><a href="/" >michaeldavidson.me</a></div>
-				<div class="section">
-					<ul>
-						<li><a href="/about">about</a></li>
-						<li><a href="/">index</a></li>
-						<li><a href="http://twitter.com/mrmdavidson">@mrmdavidson</a></li>
-						<li><a href="https://github.com/MrMDavidson">github</a></li>
-						<li><a href="mailto:me@michaeldavidson.me">me@michaeldavidson.me</a></li>
-						<li><a href="/rss.xml"><img src="/img/25.png" /> feed</a></li>
-					</ul>
+	<body role="document">
+		<!--<div class="blog-masthead">-->
+			<!-- Fixed navbar -->
+			<nav id="top" class="navbar navbar-inverse navbar-static-top">
+				<div class="container">
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+							<span class="sr-only">Toggle navigation</span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+						<span class="navbar-brand">
+							<a href="/"><img src="/img/logo-mini.png" alt="michaeldavidson.me" /></a>
+						</span>
+						<a class="navbar-brand" href="/">michaeldavidson.me</a>
+					</div>
+					
+					<div id="navbar" class="navbar-collapse collapse">
+						<ul class="nav navbar-nav">
+							<li class="active"><a href="/">Home</a></li>
+							<li class=""><a href="/about">About</a></li>
+	
+							<!--Category Menu-->
+							<li class=" dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">By Category <span class="caret"></span></a>
+								<ul class="dropdown-menu">
+									
+										<li class=""><a href="/category/technology">Technology <span class="badge">4</span></a></li>
+									
+								</ul>
+							</li>
+							
+							
+							<!--Tag Menu-->
+							<li class=" dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">By Tags <span class="caret"></span></a>
+								<ul class="dropdown-menu">
+									
+										<li class=""><a href="/tag/blog">Blog <span class="badge">2</span></a></li>
+									
+										<li class=""><a href="/tag/pretzel">Pretzel <span class="badge">2</span></a></li>
+									
+										<li class=""><a href="/tag/sql">Sql <span class="badge">1</span></a></li>
+									
+										<li class=""><a href="/tag/web">Web <span class="badge">1</span></a></li>
+									
+								</ul>
+							</li>
+						</ul>
+					</div><!--/.nav-collapse -->
 				</div>
-			</div>
-			<div id="content">
-				<div class="entry-container">
-	<div class='entry'>
-		<h1> The Curse of the Evergreen Web </h1>
+			</nav>
+		<!--</div>-->
 		
-			<div>Posted under: 
+		<div class="container">
+			<div class="container">
+	<div class="row">
+		<div class="col-md-8">
+			<h1>
+				The Curse of the Evergreen Web
 				
-					<a href="/category/technology">technology</a> 
+					<small>12 September, 2015</small>
 				
-			</div>	
-		
-		
-			<div>Tags: 
-				
-					<a href="/tag/web">web</a> 
-				
-			</div>
-		
-
-		
-		<span class="postdate">12 September, 2015</span>
-		
-		<p>With the release of Windows 10 Microsoft introduced a new browser known as Edge. It would free us web developers from having to support IE 12 in 10 years time like we do with IE6 now. From a release management perspective this isn't revolutionary. Firefox and Chrome have been doing this for years. Most users of either of these browsers wouldn't have a clue what particular version of those browsers they're on. (Don't believe me? Quick, talk to a colleague, a friend, a relative and ask them if they're running Chrome 44 or Chrome 45. I'll wait...) In many ways this is a great thing. It's something Scott Hanselman refers to as <a href="http://www.hanselman.com/blog/TheEvergreenWeb.aspx">The Evergreen Web</a>. In the article Scott talks about the important of compatibility modes. When most developers think of browsers and compatibility modes they think rendering engines. However recently Chrome 45 was released and it made me realise there's a curse to the &quot;Evergreen Web&quot; - we developers seem to think it'll only ever mean things will get better. But humans write software and humans make mistakes. So bugs will ineveitably be introduced into the latest versions of browsers. Bugs that will break existing, well documented, standardised behaviour.</p>
+			</h1>
+			
+				<ol class="breadcrumb">
+					<li><a href="/">Home</a></li>
+					
+						<li>
+						
+							<a href="/category/technology">Technology</a>
+						
+						</li>
+					
+					
+						<li>	
+						
+							<a href="/tag/web">Web</a>
+						
+						</li>
+						
+				</ol>
+			
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-8">
+			<p>With the release of Windows 10 Microsoft introduced a new browser known as Edge. It would free us web developers from having to support IE 12 in 10 years time like we do with IE6 now. From a release management perspective this isn't revolutionary. Firefox and Chrome have been doing this for years. Most users of either of these browsers wouldn't have a clue what particular version of those browsers they're on. (Don't believe me? Quick, talk to a colleague, a friend, a relative and ask them if they're running Chrome 44 or Chrome 45. I'll wait...) In many ways this is a great thing. It's something Scott Hanselman refers to as <a href="http://www.hanselman.com/blog/TheEvergreenWeb.aspx">The Evergreen Web</a>. In the article Scott talks about the important of compatibility modes. When most developers think of browsers and compatibility modes they think rendering engines. However recently Chrome 45 was released and it made me realise there's a curse to the &quot;Evergreen Web&quot; - we developers seem to think it'll only ever mean things will get better. But humans write software and humans make mistakes. So bugs will ineveitably be introduced into the latest versions of browsers. Bugs that will break existing, well documented, standardised behaviour.</p>
 <p>A little bit of background here. Many years ago the developers of the HTTP specification realised that connection speeds aren't infinite, that time outs happen, connections drop, and that resources can be large. So they implemented something called range requests and responses. When your browser talks to a server it tells the server &quot;Hey! I want all of this resource!&quot; it does this by using a request header of <code>Range: bytes=0-</code>. This tells the server that the web browser knows about range requests and it's currently requesting the range 0 to the end of the file. If the resource is hosted on even a remotely modern web server the server will respond with a slightly different response to normal. For one it will return a response code of <code>206 Partial Content</code> instead of a standard <code>200 OK</code> response. Additionally you'll see headers something like;</p>
 <pre><code>Accept-Ranges: bytes
 Content-Length: 1234
@@ -78,32 +141,52 @@ Content-Range: bytes 400-1233/1234
 <p>So the Evergreen Web isn't just some amazing blessing for us web developers. It can have very real impacts. From user experiences to financial impacts. I should point out that this problem is only present in Chrome 45 when requesting MP3s. And it was all done as part of a bug fix that meant that Chrome &lt; 45 required <a href="https://code.google.com/p/chromium/issues/detail?id=397365">XING/INFO headers even on CBR MP3s to seek</a>. Maybe for most people it's not a huge problem but I just spent two days playing around with potential work arounds. The Chrome's team response to this is that they'll have it <a href="https://code.google.com/p/chromium/issues/detail?id=530043#c10">fixed for Chromium 47</a>. I'm not 100% sure on the cycle between Chrome and Chromium but Chromium 45 was branched on <a href="https://www.chromium.org/developers/calendar">July 10th</a> and Chrome 45 got released on the <a href="https://en.wikipedia.org/wiki/Google_Chrome_release_history">1st of September</a>. Chromium 47 is scheduled to be branched on <a href="https://www.chromium.org/developers/calendar">October 2nd</a> - if there's a similar branch to release gap we'll be living with this bug until December. That's a lot of wasted time and money in the interim.</p>
 <p>In the mean time if you're prone to wanting to skip through MP3s on the web you have a few options; you can try using AAC files instead, you can use Chrome 44, or you can use another browser.</p>
 <p>Note: If you a developer affected by this and you manage to find a work around please let me know!</p>
-	</div>
-</div>
-<div id="page-navigation"> 
-	<div class="left">  </div> 
-	<div class="right">  </div> 
-	<div class="clear">&nbsp;</div>
-</div> 
-
-
-
-<div id="disqus_thread"></div>
-<script type="text/javascript">
-    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-    var disqus_shortname = 'mrmdavidson'; // required: replace example with your forum shortname
-    /* * * DON'T EDIT BELOW THIS LINE * * */
-    (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
-
-			</div>
 		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-8" id="page-navigation"> 
+			<div class="left">  </div> 
+			<div class="right">  </div> 
+			<div class="clear">&nbsp;</div>
+		</div> 
+	</div>
+	
+	
+	
+	<div id="disqus_thread"></div>
+	<script type="text/javascript">
+		/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+		var disqus_shortname = 'mrmdavidson'; // required: replace example with your forum shortname
+		/* * * DON'T EDIT BELOW THIS LINE * * */
+		(function() {
+			var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+			dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+			(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+		})();
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+	<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+	
+</div>
+		</div>
+
+		<footer>
+			<ul class="list-inline">
+				<li><a href="https://twitter.com/mrmdavidson">@mrmdavidson</a></li>
+				<li><a href="https://github.com/MrMDavidson">Github</a></li>
+				<li><a href="http://stackoverflow.com/users/150728/mrmdavidson">StackOverflow</a></li>
+				<li><a href="mailto:me@michaeldavidson.me">me@michaeldavidson.me</a></li>
+				<li><a href="/rss.xml"><img src="/img/25.png" />&nbsp;RSS feed</a></li>
+			</ul>
+			
+			<p><a href="#top">Back to top</a></p>
+		</footer>
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+		
+		<!-- Bootstrap -->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>	
+		
 		<script src="//cdn.jsdelivr.net/highlight.js/8.4/highlight.min.js"></script>
 		<script>hljs.initHighlightingOnLoad();</script>
 		

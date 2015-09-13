@@ -6,14 +6,9 @@ categories: [ technology ]
 tags: [ pretzel, blog ]
 ---
 
-Several years ago now Scott Hanselman wrote an blog post titled [Your Blog is the Engine of Community](http://www.hanselman.com/blog/YourBlogIsTheEngineOfCommunity.aspx). The basic premise of it, for those too lazy to read it,
-was that you should own your own content. Sites like Twitter and Facebook are intrinsically transient and, perhaps more importantly, owned by someone else. "That makes sense!" I thought. And so I had a look about on the internet
-came across [Github Pages](https://pages.github.com/) had a quick play and... forgot about it. And then today a friend of mine was looking at ditching Wordpress for their own blog and asked if I had any suggestions. I gave a half
-hearted reply about something like [Github Pages](https://pages.github.com/) and then... thought about it... and thought I should finally get my act together and finish playing with them myself.
+Several years ago now Scott Hanselman wrote a blog post titled [Your Blog is the Engine of Community](http://www.hanselman.com/blog/YourBlogIsTheEngineOfCommunity.aspx). The basic premise of it, for those too lazy to read it, was that you should own your own content. Sites like Twitter and Facebook are intrinsically transient and, perhaps more importantly, owned by someone else. "That makes sense!" I thought. And so I had a look about on the internet came across [Github Pages](https://pages.github.com/) had a quick play and... forgot about it. And then today a friend of mine was looking at ditching Wordpress for their own blog and asked if I had any suggestions. I gave a half hearted reply about something like [Github Pages](https://pages.github.com/) and then... thought about it... and thought I should finally get my act together and finish playing with them myself.
 
-My initial issue last time I looked into Github Pages was that they run [Jekyll](http://jekyllrb.com/). Which isn't a bad thing, it's a nice bit of software, but as a Windows developer it seemed like a bunch of things I've only
-had passing exposure to. I had a look for other static blog engines and came across [Pretzel](http://code52.org/pretzel.html). Like Jekyll Pretzel generates a static blog for you from [Markdown](http://daringfireball.net/projects/markdown/)
-however unlike Jekyll it's written in .Net and feels more "natural" to a C# developer like myself. I did, however, have a few minor issues along the way, so I figured I'd kill two birds with one stone and write about them.
+My initial issue last time I looked into Github Pages was that they run [Jekyll](http://jekyllrb.com/). Which isn't a bad thing, it's a nice bit of software, but as a Windows developer it seemed like a bunch of things I've only had passing exposure to. I had a look for other static blog engines and came across [Pretzel](http://code52.org/pretzel.html). Like Jekyll Pretzel generates a static blog for you from [Markdown](http://daringfireball.net/projects/markdown/) however unlike Jekyll it's written in .Net and feels more "natural" to a C# developer like myself. I did, however, have a few minor issues along the way, so I figured I'd kill two birds with one stone and write about them.
 
 ## 1.  Getting Pretzel
 
@@ -101,9 +96,7 @@ pretzel.exe bake
 
 *Milliseconds later it'll have finished its work.*
 
-Now inside your repository you'll have an `_site` directory. This is a static build of your site (Note: Anything starting with `_` is ignored by Jekyll and Pretzel by convention). You can point your browser here and everything 
-should work. But if you push this to your repository it won't have the desired results. What we're going to do is place a ".nojekyll" file in our directory - this is an instruction to Github to not run Jekyll on this repository.
-I know this seems counter intuitive, but trust me.
+Now inside your repository you'll have an `_site` directory. This is a static build of your site (Note: Anything starting with `_` is ignored by Jekyll and Pretzel by convention). You can point your browser here and everything should work. But if you push this to your repository it won't have the desired results. What we're going to do is place a ".nojekyll" file in our directory - this is an instruction to Github to not run Jekyll on this repository. I know this seems counter intuitive, but trust me.
 
 ```dos
 echo "" > .nojekyll
@@ -114,8 +107,7 @@ git push
 
 Now if you visit your lovely blog... it'll be completely broken. How is this helpful? Stay with me here!
 
-What we're going to do is create a new branch. [Master](https://github.com/MrMDavidson/mrmdavidson.github.io/tree/master) will be used for the generated content of the site. And our new branch, say, [Pretzel](https://github.com/MrMDavidson/mrmdavidson.github.io/tree/pretzel)
-will be used to store our working blog. This way both our blog "data" and our generated site is under source control.
+What we're going to do is create a new branch. [Master](https://github.com/MrMDavidson/mrmdavidson.github.io/tree/master) will be used for the generated content of the site. And our new branch, say, [Pretzel](https://github.com/MrMDavidson/mrmdavidson.github.io/tree/pretzel) will be used to store our working blog. This way both our blog "data" and our generated site is under source control.
 
 To avoid confusion we'll create two new copies of the repository...
 
@@ -127,8 +119,7 @@ git checkout -B pretzel
 git push origin
 ```
 
-Now what we'll do is create blog posts in the `mrmdavidson.github.io-blog` directory which pushes to a "Pretzel" branch. Once we've finished tasting these we can generate the static content into master.
-Let's start by cleaning master. You'll want to delete from git everything in here but your `.nojekyll` file. Once you've done that...
+Now what we'll do is create blog posts in the `mrmdavidson.github.io-blog` directory which pushes to a "Pretzel" branch. Once we've finished tasting these we can generate the static content into master. Let's start by cleaning master. You'll want to delete from git everything in here but your `.nojekyll` file. Once you've done that...
 
 ```dos
 cd mrmdavidson.github.io-blog

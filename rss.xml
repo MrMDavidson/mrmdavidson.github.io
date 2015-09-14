@@ -2,19 +2,19 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
     <title>Feed Name</title>
-    <link>http://domain/</link>
-    <atom:link href="http://domain/rss.xml" rel="self" type="application/rss+xml" />
+    <link>http://michaeldavidson.me/</link>
+    <atom:link href="http://michaeldavidson.me/rss.xml" rel="self" type="application/rss+xml" />
     <description></description>
     <language>en-au</language>
-    <pubDate>Mon, 14 Sep 2015 01:31:33 %z</pubDate>
-    <lastBuildDate>Mon, 14 Sep 2015 01:31:33 %z</lastBuildDate>
+    <pubDate>Mon, 14 Sep 2015 15:12:18 %z</pubDate>
+    <lastBuildDate>Mon, 14 Sep 2015 15:12:18 %z</lastBuildDate>
     
     <item>
       <title>The Curse of the Evergreen Web</title>
-      <link>http://domain/2015/09/12/the-curse-of-the-evergreen-web/</link>
+      <link>http://michaeldavidson.me/2015/09/12/the-curse-of-the-evergreen-web/</link>
       <pubDate>Sat, 12 Sep 2015 00:00:00 %z</pubDate>
       <author>Author</author>
-      <guid>http://domain/2015/09/12/the-curse-of-the-evergreen-web/</guid>
+      <guid>http://michaeldavidson.me/2015/09/12/the-curse-of-the-evergreen-web/</guid>
       <description>&lt;p&gt;With the release of Windows 10 Microsoft introduced a new browser, Edge, that promised to free us web developers from having to support IE 12 in 10 years time like we do with IE6 now. Edge is hardly the first browser to introduce constantly updated versions; Firefox and Chrome have been doing this for years. Most users of either of these browsers wouldn&apos;t have a clue what particular version of those browsers they&apos;re on. (Don&apos;t believe me? Quick, talk to a colleague, a friend, a relative and ask them if they&apos;re running Chrome 44 or Chrome 45. I&apos;ll wait...) This is something Scott Hanselman refers to as &lt;a href=&quot;http://www.hanselman.com/blog/TheEvergreenWeb.aspx&quot;&gt;The Evergreen Web&lt;/a&gt;. In the article Scott talks about the importance of compatibility modes and as time progresses they&apos;re going to become more and more important. However when most developers think of browsers and compatibility modes they think rendering engines but I recently stumbled across some behaviour in Chrome 45 that was fundamentally different (and broken) as compared to the behaviour of Chrome 44. It made me realise there&apos;s a curse to the &amp;quot;Evergreen Web&amp;quot; - we developers seem to think it&apos;ll only ever mean things will get better. But humans write software and humans make mistakes. So bugs will ineveitably be introduced into the latest versions of browsers. Bugs that will break existing, well documented, standardised behaviour.&lt;/p&gt;
 &lt;p&gt;A little bit of background here; Many years ago the developers of the HTTP specification realised that connection speeds aren&apos;t infinite, that time outs happen, connections drop, and that resources can be large. So they implemented something called range requests and responses. When your browser talks to a server it tells the server &amp;quot;Hey! I want all of this resource!&amp;quot; it does this by using a request header of &lt;code&gt;Range: bytes=0-&lt;/code&gt;. This tells the server that the web browser knows about range requests and it&apos;s currently requesting the range 0 to the end of the file. If the resource is hosted on even a remotely modern web server the server will respond with a slightly different response to normal. For one it will return a response code of &lt;code&gt;206 Partial Content&lt;/code&gt; instead of a standard &lt;code&gt;200 OK&lt;/code&gt; response. Additionally you&apos;ll see headers something like;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;Accept-Ranges: bytes
@@ -48,10 +48,10 @@ Content-Range: bytes 400-1233/1234
     
     <item>
       <title>SQL Server Tricks</title>
-      <link>http://domain/2015/09/06/sql-server-tricks/</link>
+      <link>http://michaeldavidson.me/2015/09/06/sql-server-tricks/</link>
       <pubDate>Sun, 06 Sep 2015 00:00:00 %z</pubDate>
       <author>Author</author>
-      <guid>http://domain/2015/09/06/sql-server-tricks/</guid>
+      <guid>http://michaeldavidson.me/2015/09/06/sql-server-tricks/</guid>
       <description>&lt;p&gt;Throughout my career I&apos;ve spent more than my fair share of time in the database layer. There&apos;s a current trent in the .Net world of just letting your ORM take care of everything in the data layer for you. I&apos;m a huge proponent of using an ORM for mapping (at work we&apos;re currently using StackExchange&apos;s &lt;a href=&quot;https://github.com/StackExchange/dapper-dot-net&quot;&gt;Dapper.net&lt;/a&gt;). However I&apos;ve always been a little wary of letting the ORM do everything for you. As such I thought I&apos;d jot down a few handy SQL Server tricks I&apos;ve picked up over the years.&lt;/p&gt;
 &lt;h3&gt;1. The Output Clause&lt;/h3&gt;
 &lt;p&gt;The &lt;a href=&quot;https://msdn.microsoft.com/en-us/library/ms177564.aspx&quot;&gt;&lt;code&gt;OUTPUT&lt;/code&gt; clause&lt;/a&gt; let&apos;s you execute a data modification statement and have it project a result set. In plain English that means that you can perform a &lt;code&gt;DELETE&lt;/code&gt;, &lt;code&gt;INSERT&lt;/code&gt; or &lt;code&gt;UPDATE&lt;/code&gt; &lt;strong&gt;and&lt;/strong&gt; have it return a resultset. This has been around since SQL Server 2008 but doesn&apos;t seem to get much attention. An example might be;&lt;/p&gt;
@@ -165,10 +165,10 @@ Here we can see that the right hand query, SPID 52, is currently blocked by SPID
     
     <item>
       <title>Tags?</title>
-      <link>http://domain/2015/08/31/tags/</link>
+      <link>http://michaeldavidson.me/2015/08/31/tags/</link>
       <pubDate>Mon, 31 Aug 2015 00:00:00 %z</pubDate>
       <author>Author</author>
-      <guid>http://domain/2015/08/31/tags/</guid>
+      <guid>http://michaeldavidson.me/2015/08/31/tags/</guid>
       <description>&lt;p&gt;After doing my initial &lt;a href=&quot;/2015/08/30/myfirstpost.html&quot;&gt;post yesterday&lt;/a&gt; I realised it&apos;d be useful to have tags (or categories, whatever your preferred nomenclature) support. It&apos;s an easy way for a user to quickly find everything relating to, say, &lt;a href=&quot;/tag/pretzel&quot;&gt;Pretzel&lt;/a&gt; without having to read about &lt;a href=&quot;/tag/cats&quot;&gt;cats&lt;/a&gt;. How do we go about getting such a feature? Remeember that Pretzel is a static blog engine. Everything is generated offline on your computer and then uploaded to your host (in my case, &lt;a href=&quot;https://pages.github.com&quot;&gt;Github Pages&lt;/a&gt;) so there&apos;s no hitting a database to pull back the relevant files.&lt;/p&gt;
 &lt;p&gt;If you investigate a little bit you&apos;ll find that when you&apos;re viewing an individual post the template used to generate the static HTML is &lt;a href=&quot;https://github.com/MrMDavidson/mrmdavidson.github.io/blob/a3b3e198dbecbbe6e86893ab0276963eb694cf70/_layouts/post.html&quot;&gt;_layouts/post.html&lt;/a&gt; which seems to have some code relating to tags;&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;{% for tag in page.tags %}
@@ -262,10 +262,10 @@ layout: layout
     
     <item>
       <title>My First Post</title>
-      <link>http://domain/2015/08/30/myfirstpost/</link>
+      <link>http://michaeldavidson.me/2015/08/30/myfirstpost/</link>
       <pubDate>Sun, 30 Aug 2015 00:00:00 %z</pubDate>
       <author>Author</author>
-      <guid>http://domain/2015/08/30/myfirstpost/</guid>
+      <guid>http://michaeldavidson.me/2015/08/30/myfirstpost/</guid>
       <description>&lt;p&gt;Several years ago now Scott Hanselman wrote a blog post titled &lt;a href=&quot;http://www.hanselman.com/blog/YourBlogIsTheEngineOfCommunity.aspx&quot;&gt;Your Blog is the Engine of Community&lt;/a&gt;. The basic premise of it, for those too lazy to read it, was that you should own your own content. Sites like Twitter and Facebook are intrinsically transient and, perhaps more importantly, owned by someone else. &amp;quot;That makes sense!&amp;quot; I thought. And so I had a look about on the internet came across &lt;a href=&quot;https://pages.github.com/&quot;&gt;Github Pages&lt;/a&gt; had a quick play and... forgot about it. And then today a friend of mine was looking at ditching Wordpress for their own blog and asked if I had any suggestions. I gave a half hearted reply about something like &lt;a href=&quot;https://pages.github.com/&quot;&gt;Github Pages&lt;/a&gt; and then... thought about it... and thought I should finally get my act together and finish playing with them myself.&lt;/p&gt;
 &lt;p&gt;My initial issue last time I looked into Github Pages was that they run &lt;a href=&quot;http://jekyllrb.com/&quot;&gt;Jekyll&lt;/a&gt;. Which isn&apos;t a bad thing, it&apos;s a nice bit of software, but as a Windows developer it seemed like a bunch of things I&apos;ve only had passing exposure to. I had a look for other static blog engines and came across &lt;a href=&quot;http://code52.org/pretzel.html&quot;&gt;Pretzel&lt;/a&gt;. Like Jekyll Pretzel generates a static blog for you from &lt;a href=&quot;http://daringfireball.net/projects/markdown/&quot;&gt;Markdown&lt;/a&gt; however unlike Jekyll it&apos;s written in .Net and feels more &amp;quot;natural&amp;quot; to a C# developer like myself. I did, however, have a few minor issues along the way, so I figured I&apos;d kill two birds with one stone and write about them.&lt;/p&gt;
 &lt;h2&gt;1.  Getting Pretzel&lt;/h2&gt;

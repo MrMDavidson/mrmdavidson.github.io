@@ -59,3 +59,5 @@ It does make me wonder though; if an issue like this is going to take the Chrome
 Until Chrome 47 lands, then, if you want to skip through audio files on the web you have a few options; you can try using AAC files instead, you can use Chrome 44, or you can use another browser. 
 
 Note: If you a developer affected by this and you manage to find a work around please let me know!
+
+**UPDATE 2015-09-16**: The Chrome team is now aiming to get this out in time for [Chrome 46](https://code.google.com/p/chromium/issues/detail?id=530043#c15). I still have no exact idea of the timeline of when that will be. But it's better news than having to wait for 47. 

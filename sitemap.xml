@@ -46,7 +46,7 @@
   
 	
 	<url>
-		<loc>http://michaeldavidson.me/atom.xml</loc>
+		<loc>http://michaeldavidson.me/C:/Users/mrmda_000/Documents/Blog/mrmdavidson.github.io-pretzel/../mrmdavidson.github.io-master/atom.xml</loc>
 		<changefreq>daily</changefreq>
 		<priority>1.00</priority>
 	</url>
@@ -56,7 +56,7 @@
   
 	
 	<url>
-		<loc>http://michaeldavidson.me/index.html</loc>
+		<loc>http://michaeldavidson.me/C:/Users/mrmda_000/Documents/Blog/mrmdavidson.github.io-pretzel/../mrmdavidson.github.io-master/index.html</loc>
 		<changefreq>daily</changefreq>
 		<priority>1.00</priority>
 	</url>
@@ -64,7 +64,7 @@
   
 	
 	<url>
-		<loc>http://michaeldavidson.me/rss.xml</loc>
+		<loc>http://michaeldavidson.me/C:/Users/mrmda_000/Documents/Blog/mrmdavidson.github.io-pretzel/../mrmdavidson.github.io-master/rss.xml</loc>
 		<changefreq>daily</changefreq>
 		<priority>1.00</priority>
 	</url>
@@ -72,7 +72,7 @@
   
 	
 	<url>
-		<loc>http://michaeldavidson.me/sitemap.xml</loc>
+		<loc>http://michaeldavidson.me/C:/Users/mrmda_000/Documents/Blog/mrmdavidson.github.io-pretzel/../mrmdavidson.github.io-master/sitemap.xml</loc>
 		<changefreq>daily</changefreq>
 		<priority>1.00</priority>
 	</url>

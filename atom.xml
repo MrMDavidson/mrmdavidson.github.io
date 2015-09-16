@@ -3,7 +3,7 @@
   <title>Feed Name</title>
   <link href="http://domain/"/>
   <link type="application/atom+xml" rel="self" href="http://domain/atom.xml"/>
-  <updated>2015-09-15T13:39:24.0914243+10:00</updated>
+  <updated>2015-09-16T11:22:20.6564946+10:00</updated>
   <id>http://domain/</id>
   <author>
     <name>Author</name>
@@ -48,7 +48,8 @@ Content-Range: bytes 400-1233/1234
 &lt;p&gt;I should point out that this problem is, currently, only present in Chrome 45 when dealing with MP3s. It seems to have been done as part of a bug fix that meant that Chrome &amp;lt; 45 required &lt;a href=&quot;https://code.google.com/p/chromium/issues/detail?id=397365&quot;&gt;XING/INFO headers even on CBR MP3s to seek&lt;/a&gt;. For most people this probably isn&apos;t a huge problem but I just spent two days playing around with potential work arounds. The Chrome team&apos;s response to this is that they&apos;ll have it &lt;a href=&quot;https://code.google.com/p/chromium/issues/detail?id=530043#c10&quot;&gt;fixed for Chromium 47&lt;/a&gt;. I&apos;m not 100% sure on the cycle between Chrome and Chromium but Chromium 45 was branched on &lt;a href=&quot;https://www.chromium.org/developers/calendar&quot;&gt;July 10th&lt;/a&gt; and Chrome 45 got released on the &lt;a href=&quot;https://en.wikipedia.org/wiki/Google_Chrome_release_history&quot;&gt;1st of September&lt;/a&gt;. Chromium 47 is scheduled to be branched on &lt;a href=&quot;https://www.chromium.org/developers/calendar&quot;&gt;October 2nd&lt;/a&gt; - if there&apos;s a similar branch to release gap we&apos;ll be living with this bug until December. In the mean time I guess a lot of MP3 bits will be getting streamed to &lt;code&gt;/dev/null&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;It does make me wonder though; if an issue like this is going to take the Chrome team weeks, or months, to fix are we running the risk that people will start to build to these behaviours? Maybe someone, somewhere, uses this feature to force a user to have a degraded experience if they try to skip through an ad. Not the best example but I can definitely envision a point where people build web features utilising the exact behaviour of a browser version. And if  web developers start to rely on features specific to a range of browser versions is it going to become a &lt;a href=&quot;https://en.wikipedia.org/wiki/Quirks_mode&quot;&gt;Quirks Mode&lt;/a&gt; that the browser maintainers have to implement? Is someone one day going to include a &lt;code&gt;&amp;lt;meta&amp;gt;&lt;/code&gt; tag in the &lt;code&gt;&amp;lt;head&amp;gt;&lt;/code&gt; of their document to get newer versions of Chrome to break range requests for MP3 files?&lt;/p&gt;
 &lt;p&gt;Until Chrome 47 lands, then, if you want to skip through audio files on the web you have a few options; you can try using AAC files instead, you can use Chrome 44, or you can use another browser.&lt;/p&gt;
-&lt;p&gt;Note: If you a developer affected by this and you manage to find a work around please let me know!&lt;/p&gt;</content>
+&lt;p&gt;Note: If you a developer affected by this and you manage to find a work around please let me know!&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;UPDATE 2015-09-16&lt;/strong&gt;: The Chrome team is now aiming to get this out in time for &lt;a href=&quot;https://code.google.com/p/chromium/issues/detail?id=530043#c15&quot;&gt;Chrome 46&lt;/a&gt;. I still have no exact idea of the timeline of when that will be. But it&apos;s better news than having to wait for 47.&lt;/p&gt;</content>
   </entry>
   
   <entry>

@@ -3,13 +3,135 @@
   <title>Feed Name</title>
   <link href="http://domain/"/>
   <link type="application/atom+xml" rel="self" href="http://domain/atom.xml"/>
-  <updated>2015-09-16T11:22:20.6564946+10:00</updated>
+  <updated>2015-10-06T23:46:28.5315749+11:00</updated>
   <id>http://domain/</id>
   <author>
     <name>Author</name>
     <email>Email</email>
   </author>
 
+  
+  <entry>
+    <id>http://domain//2015/10/06/finding-dominant-colours-in-images/</id>
+    <link type="text/html" rel="alternate" href="http://domain//2015/10/06/finding-dominant-colours-in-images/"/>
+    <title>Finding Dominant Colours in Images</title>
+    <updated>2015-10-06T00:00:00+11:00</updated>
+    <author>
+      <name>Author</name>
+      <uri>http://domain/</uri>
+    </author>
+    <content type="html">&lt;p&gt;A colleague recently shared a link to &lt;a href=&quot;http://charlesleifer.com/blog/using-python-and-k-means-to-find-the-dominant-colors-in-images/&quot;&gt;Charles Leifer&apos;s blog post on finding dominant colours in images&lt;/a&gt; and mentioned it was something he&apos;d like to eventually integrate into our own product at some time. &lt;a href=&quot;https://en.wikipedia.org/wiki/K-means_clustering&quot;&gt;K-Means clustering&lt;/a&gt; is something I have a vague familiarity with but isn&apos;t something I&apos;ve personally implemented before so with a spare day over the weekend I figured I&apos;d give it a shot.&lt;/p&gt;
+&lt;p&gt;If you don&apos;t have an background in algorithms reading about K-Means clustering will lead you to all sorts of &lt;a href=&quot;http://stats.stackexchange.com/a/91076&quot;&gt;Greek letters and mathematical symbols&lt;/a&gt; which may be a little confusing but the actual algorithm is surprisingly straight forward. If you just want to dive straight into the code have a look at &lt;a href=&quot;https://github.com/MrMDavidson/code-samples/tree/master/FindDominantColour&quot;&gt;my code samples repository&lt;/a&gt; which has a simple implementation. Otherwise, stick with me.&lt;/p&gt;
+&lt;p&gt;If you&apos;re not familiar with this idea it might help to start with a few examples. Below are three examples produced via the code linked above. In each of them the bottom of the image has three colour swatches which are the k means clusters (in this example, k is 3).&lt;/p&gt;
+&lt;h2&gt;Examples&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&quot;/img/posts/2015-10-06-finding-dominant-colours-in-images/coffee.png&quot; alt=&quot;Coffee&quot; title=&quot;Coffee&quot; /&gt;
+&lt;img src=&quot;/img/posts/2015-10-06-finding-dominant-colours-in-images/rose.png&quot; alt=&quot;Rose&quot; title=&quot;Rose&quot; /&gt;
+&lt;img src=&quot;/img/posts/2015-10-06-finding-dominant-colours-in-images/playmobil.png&quot; alt=&quot;Play Mobil&quot; title=&quot;Play Mobil&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;I think looking at these three sample images (all from the &lt;a href=&quot;http://www.morguefile.com/&quot;&gt;Morgue File Project&lt;/a&gt; and free for use) highlights some interesting aspects of the algorithm. The coffee and rose images swatches both look like what your, or at least, my expectation of the dominant colours are in these images. The plastic figurine image isn&apos;t what I initially expected and this gets into the difference between perceived dominance and statistical colour dominance. Looking at this image the light and dark grey and the black are indeed the most &lt;em&gt;common&lt;/em&gt; colours in the image but they&apos;re not the one your eyes are drawn to. You immediately notice the blue of the figures shoes and shirt, yellow pants and ginger hair. However the statistical commonality of these colours is rather low (and their variance from each other would mute their affect on the algorithm). If you are looking for something to get this highlight colour out there&apos;s a few things you could do which I&apos;ll discuss later.&lt;/p&gt;
+&lt;h2&gt;Algorithm&lt;/h2&gt;
+&lt;p&gt;Now the actual algorithm;&lt;/p&gt;
+&lt;ol start=&quot;0&quot;&gt;
+&lt;li&gt;Collect your data. Here I&apos;m using .Net&apos;s &lt;a href=&quot;https://msdn.microsoft.com/en-us/library/system.drawing.image(v=vs.110).aspx&quot;&gt;&lt;code&gt;Image&lt;/code&gt;&lt;/a&gt; class to load the pixel data&lt;/li&gt;
+&lt;li&gt;Determine a set of &lt;code&gt;k&lt;/code&gt; initial clusters for your data&lt;/li&gt;
+&lt;li&gt;For each pixel in your image determine the colour&apos;s &lt;a href=&quot;https://en.wikipedia.org/wiki/Euclidean_distance&quot;&gt;Euclidean distance&lt;/a&gt; to its nearest cluster&lt;/li&gt;
+&lt;li&gt;Recalculate the centre of each cluster based on the colours in the cluster&lt;/li&gt;
+&lt;li&gt;If the centre of any of the clusters changed, clear the clusters and go back to 2.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3&gt;0. Collect your data&lt;/h3&gt;
+&lt;p&gt;This is pretty straightforward. You want to load all of the pixels colours of your image into memory. If you look at &lt;a href=&quot;https://github.com/MrMDavidson/code-samples/blob/bedb15ed8748af80936f939fc22b12287f8faa11/FindDominantColour/Program.cs#L43&quot;&gt;Program.cs&lt;/a&gt; I&apos;m doing this very naively through a call to &lt;code&gt;Image::GetPixel()&lt;/code&gt;. It&apos;s not terribly performant but you&apos;ll find that the calculation of the k means will likely take much longer than your repeated calls to &lt;code&gt;Image::GetPixel()&lt;/code&gt;. One thing that &lt;em&gt;is&lt;/em&gt; worth optimising however is the amount of data you load; if you&apos;ve taken a quick snapshot with your phone&apos;s 8 MegaPixel camera you&apos;re not going to need all 8 million pixels. It&apos;s worth resizing the image down to something more mangeable. I&apos;ve had good results with images with a maximum dimension of 75pixels but it will depend on the complexity of your images. Full colour photographs will work better with more pixels as compared to simple logos or drawings. A maximum image dimension of 200 pixels seems to be a good balance between results and speed.&lt;/p&gt;
+&lt;h3&gt;1. Determine a set of &lt;code&gt;k&lt;/code&gt; initial clusters&lt;/h3&gt;
+&lt;p&gt;The first real part of the algorith is to determine your initial &lt;code&gt;k&lt;/code&gt; clusters. Remember that &lt;code&gt;k&lt;/code&gt; is how many dominant colours you want out of your image. There&apos;s two approaches to determining your initial clusters; The Forgy Method and Random Initialisation. Random Initialisation actually yields excellent results in most cases and it&apos;s really easy to implement. You just pick &lt;code&gt;k&lt;/code&gt; random colours from your list. Their positioning in pixel space doesn&apos;t matter (infact you can discard the pixel coordinates completely it&apos;s only colour space you require). Psuedo-C# for this phase is really straight forward;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-cs&quot;&gt;List&amp;lt;Color&amp;gt; colors = GetSourceData();
+Random r = new Random();
+
+for (int i = 0; i &amp;lt; k; i++) {
+  int index = r.Next(0, colors.Count);
+  AddInitialCluster(colors[index]);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The actual implementation can be found in &lt;a href=&quot;https://github.com/MrMDavidson/code-samples/blob/bedb15ed8748af80936f939fc22b12287f8faa11/FindDominantColour/KMeansClusteringCalculator.cs#L22-L36&quot;&gt;KMeansClusteringCalculator.cs&lt;/a&gt;&lt;/p&gt;
+&lt;h3&gt;2. Determine Euclidean Distance to nearest Cluster&lt;/h3&gt;
+&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Euclidean_distance&quot;&gt;Euclidean distance&lt;/a&gt;, sometimes known as Cartesian or Pythagorean distance, is the square root of the sum of the square differences between vector components. &lt;em&gt;Obviously&lt;/em&gt;. To put this another way we can think of our &lt;code&gt;Color&lt;/code&gt; as representing a point in 3-dimensional colour space (Instead of an X, Y and Z axis we have a Red, Green and Blue axis). So blue would be at position (0, 0, 255) whilst red would be at (255, 0, 0). And the Euclidiean distance between the two could be calculated with;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-cs&quot;&gt;
+private double GetEuclideanDistance(Color c1, Color c2) {
+    return Math.Sqrt(
+        Math.Pow(c1.R - c2.R, 2) + Math.Pow(c1.G - c2.G, 2) + Math.Pow(c1.B - c2.B, 2)
+    );
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The actual implementation of this can be found in &lt;a href=&quot;https://github.com/MrMDavidson/code-samples/blob/bedb15ed8748af80936f939fc22b12287f8faa11/FindDominantColour/KCluster.cs#L83-L87&quot;&gt;KCluster.cs&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Now that we know how to calculate the Euclidean distance between two colours it&apos;s a simple matter of comparing the distance for each colour to each of our clusters and adding it to the closest one.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-cs&quot;&gt;var clusterList = GetClusterList();
+
+for (Color color in colors) {
+    int indexOfNearestCluster = -1;
+    double distanceToNearestCluster = double.MaxValue;
+
+    for (int i = 0; i &amp;lt; clusterList.Length; i++) {
+        double distance = GetEuclideanDistance(clusterList[i].Centre, color);
+        if (distance &amp;lt; nearestCluster) {
+            indexOfNearestCluster = i;
+            distanceToNearestCluster = distance;
+        }
+    }
+    
+    clusterList[indexOfNearestCluster].AddColour(color);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The important thing to note here is that &lt;code&gt;clusterList&lt;/code&gt; is a list of some kind of data structure which contains the property &lt;code&gt;Centre&lt;/code&gt; which is, for the first pass, the random colour we came up with in Step 1. Over subsequent iterations this value will be updated. So, once we find the nearest cluster we want to add the colour we&apos;re currently working on to that cluster. This is important for our next step. Again, this is only pseudo-C#, and the actual implementation can be found in &lt;a href=&quot;https://github.com/MrMDavidson/code-samples/blob/bedb15ed8748af80936f939fc22b12287f8faa11/FindDominantColour/KMeansClusteringCalculator.cs#L42-L55&quot;&gt;KMeansClusteringCalculator.cs&lt;/a&gt;.&lt;/p&gt;
+&lt;h3&gt;3. Recalculate the cluster centre&lt;/h3&gt;
+&lt;p&gt;Like calculcating the Euclidean distance this is again something that looks a lot more intimidating than it is. If you look at Wikipedia you&apos;ll see a wonderfully confusing expression;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/posts/2015-10-06-finding-dominant-colours-in-images/update-step.png&quot; alt=&quot;Update Expression&quot; title=&quot;Update Expression&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;But this is actually rather straight forward; for each vector component (ie. red, green and blue) you take the average of that colour component in the cluster.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-cs&quot;&gt;
+List&amp;lt;Color&amp;gt; colorsInCluster = GetColoursInCluster();
+float r = 0;
+float g = 0;
+float b = 0;
+
+foreach (Color color in coloursInCluster) {
+    r += color.R;
+    g += color.G;
+    b += color.B;
+}
+
+Color updatedCentre = Color.FromArgb(
+    (int)Math.Round(r / colorsInCluster.Count),
+    (int)Math.Round(g / colorsInCluster.Count),
+    (int)Math.Round(b / colorsInCluster.Count)
+);
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It&apos;s actually really simple. You can find the actual implementation in &lt;a href=&quot;https://github.com/MrMDavidson/code-samples/blob/bedb15ed8748af80936f939fc22b12287f8faa11/FindDominantColour/KCluster.cs#L46-L62&quot;&gt;KCluster.cs&lt;/a&gt;.&lt;/p&gt;
+&lt;h3&gt;4. Check for Cluster Centre Changes&lt;/h3&gt;
+&lt;p&gt;This is pretty easy, actually, you take the original centre for each cluster and compute its Euclidiean distance to the new centre. If all of the distances between the old and new centres is below some threshold (or zero) you consider the algorithm complete. The new centres for each of your clusters are the dominant colours in your image. However if any of the centres have moved more than the threshold then you need to empty all of the clusters and start again from Step 2. Now however instead of computing each colour&apos;s distance to the randomly selected colour you are instead comparing it to the recalculated cluster centre. You can see this loop in &lt;a href=&quot;https://github.com/MrMDavidson/code-samples/blob/bedb15ed8748af80936f939fc22b12287f8faa11/FindDominantColour/KMeansClusteringCalculator.cs#L39-L65&quot;&gt;KMeansClusteringCalculator.cs&lt;/a&gt;&lt;/p&gt;
+&lt;h3&gt;Finally...&lt;/h3&gt;
+&lt;p&gt;As I mentioned earlier looking at the plastic figurine image the dominant colours aren&apos;t those your eye are immediately drawn to. What you can do here is filter the data you provide for Step 0. The question is what filtering do you provide? In our figurine example the issue is that there&apos;s a lot of blacks, greys and whites all of which are rather boring. So we probably want to filter those colours out. But how? If you simply filter anything that is, for example, RGB(0, 0, 0) out it won&apos;t catch RGB(0, 0, 1) or RGB(1, 1, 1) which most people would percieve as black. What we want is some kind of way of determining the distance a colour is from black, grey and white.... like, say, our Euclidean distance from earlier. You&apos;ll want to play aroud with exact figures but I found that any colour that has a Euclidean distance of more than 200 from solid black and solid white works rather well.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-cs&quot;&gt;
+List&amp;lt;Color&amp;gt; filtered = GetSourceData()
+                        .Where(c =&amp;gt; (KCluster.EuclideanDistance(c, Color.Black) &amp;gt;= 200) &amp;amp;&amp;amp; (KCluster.EuclideanDistance(c, Color.White) &amp;gt;= 200))
+                        .ToList(); 
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;After such a filter has been applied you&apos;ll end up with images more like...&lt;/p&gt;
+&lt;div class=&quot;container&quot;&gt;
+&lt;div class=&quot;row&quot;&gt;
+&lt;p&gt;&lt;img src=&quot;/img/posts/2015-10-06-finding-dominant-colours-in-images/coffee.png&quot; alt=&quot;Coffee&quot; title=&quot;Coffee&quot; /&gt;
+&lt;img src=&quot;/img/posts/2015-10-06-finding-dominant-colours-in-images/coffee.filtered.png&quot; alt=&quot;Coffee - Filtered&quot; title=&quot;Coffee - Filtered&quot; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;row&quot;&gt;
+&lt;p&gt;&lt;img src=&quot;/img/posts/2015-10-06-finding-dominant-colours-in-images/rose.png&quot; alt=&quot;Rose&quot; title=&quot;Rose&quot; /&gt;
+&lt;img src=&quot;/img/posts/2015-10-06-finding-dominant-colours-in-images/rose.filtered.png&quot; alt=&quot;Rose - Filtered&quot; title=&quot;Rose - Filtered&quot; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;row&quot;&gt;
+&lt;p&gt;&lt;img src=&quot;/img/posts/2015-10-06-finding-dominant-colours-in-images/playmobil.png&quot; alt=&quot;Play Mobil&quot; title=&quot;Play Mobil&quot; /&gt;
+&lt;img src=&quot;/img/posts/2015-10-06-finding-dominant-colours-in-images/playmobil.filtered.png&quot; alt=&quot;Play Mobil - Filtered&quot; title=&quot;Play Mobil - Filtered&quot; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;This produces excellent, eye catching, results for our plastic figurine. But notice now the most dominant colour on the coffee is the blue colour from the oil sheen? It&apos;s worthwhile playing with these threshold values to see what produces the appropriate output for your use case.&lt;/p&gt;
+&lt;p&gt;All of the source is available in my &lt;a href=&quot;https://github.com/MrMDavidson/code-samples/tree/master/FindDominantColour&quot;&gt;code-samples repository&lt;/a&gt; on GitHub. When running the code you can point it to a single file or a directory full of images. It&apos;ll produce the k means cluster for those images, output to the console, and then produce a &lt;code&gt;.output.png&lt;/code&gt; file which contains the swatches used throughout this post.&lt;/p&gt;</content>
+  </entry>
   
   <entry>
     <id>http://domain//2015/09/12/the-curse-of-the-evergreen-web/</id>

@@ -7,6 +7,13 @@
   <!-- Generated with pretzel -->
   
   <url>
+    <loc>http://michaeldavidson.me/2015/10/06/finding-dominant-colours-in-images/</loc>
+    <lastmod>2015-10-06T00:00:00+11:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.00</priority>
+  </url>
+  
+  <url>
     <loc>http://michaeldavidson.me/2015/09/12/the-curse-of-the-evergreen-web/</loc>
     <lastmod>2015-09-12T00:00:00+10:00</lastmod>
     <changefreq>daily</changefreq>
@@ -46,7 +53,7 @@
   
 	
 	<url>
-		<loc>http://michaeldavidson.me/atom.xml</loc>
+		<loc>http://michaeldavidson.me/D:/Code/Blog/mrmdavidson.github.io-pretzel/../mrmdavidson.github.io-master/atom.xml</loc>
 		<changefreq>daily</changefreq>
 		<priority>1.00</priority>
 	</url>
@@ -56,7 +63,7 @@
   
 	
 	<url>
-		<loc>http://michaeldavidson.me/index.html</loc>
+		<loc>http://michaeldavidson.me/D:/Code/Blog/mrmdavidson.github.io-pretzel/../mrmdavidson.github.io-master/index.html</loc>
 		<changefreq>daily</changefreq>
 		<priority>1.00</priority>
 	</url>
@@ -64,7 +71,7 @@
   
 	
 	<url>
-		<loc>http://michaeldavidson.me/rss.xml</loc>
+		<loc>http://michaeldavidson.me/D:/Code/Blog/mrmdavidson.github.io-pretzel/../mrmdavidson.github.io-master/rss.xml</loc>
 		<changefreq>daily</changefreq>
 		<priority>1.00</priority>
 	</url>
@@ -72,7 +79,7 @@
   
 	
 	<url>
-		<loc>http://michaeldavidson.me/sitemap.xml</loc>
+		<loc>http://michaeldavidson.me/D:/Code/Blog/mrmdavidson.github.io-pretzel/../mrmdavidson.github.io-master/sitemap.xml</loc>
 		<changefreq>daily</changefreq>
 		<priority>1.00</priority>
 	</url>
@@ -135,8 +142,38 @@
 	
   
 	
+  
+	
+  
+	
+  
+	
+  
+	
+  
+	
+  
+	
+  
+	
+	<url>
+		<loc>http://michaeldavidson.me/tag/algorithms/</loc>
+		<changefreq>daily</changefreq>
+		<priority>1.00</priority>
+	</url>
+	
+  
+	
 	<url>
 		<loc>http://michaeldavidson.me/tag/blog/</loc>
+		<changefreq>daily</changefreq>
+		<priority>1.00</priority>
+	</url>
+	
+  
+	
+	<url>
+		<loc>http://michaeldavidson.me/tag/c-sharp/</loc>
 		<changefreq>daily</changefreq>
 		<priority>1.00</priority>
 	</url>

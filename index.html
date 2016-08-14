@@ -174,7 +174,7 @@ SELECT  @Name,
 COMMIT TRAN
 </code></pre>
 <p>The determination of <code>@SortOrder</code> here is a little contrived. In an actual solution you could move the standalone <code>SELECT</code> into a sub-<code>SELECT</code> on the <code>INSERT</code> statement but let's just imagine that there's a constraint that requires this explicit separation. You launch the feature and after a few weeks you review the data and you notice a puzzling thing you're seeing instances where for a given <code>Photo.GalleryId</code> there's multiple items where <code>Photo.SortOrder</code> is duplicated. After some analysis it should be obvious what's happening; one <code>Photo</code> is attempting to get inserted and before it can complete a second <code>Photo</code> insertion attempt happens and evaluates <code>@SortOrder</code> to be the same as the first.</p>
-<p>I've written previously about <a href="/2015/09/06/sql-server-tricks.html">WAITFOR</a> and how useful it is for debugging concurrency issues. So we'll use it again here. We can chuck a <code>WAITFOR DELAY 00:00:05</code> before our <code>INSERT</code> statement and execute the statement multiple times to simulate this concurrency in human-doable-times. As below...</p>
+<p>I've written previously about <a href="/technology/2015/09/06/sql-server-tricks.html">WAITFOR</a> and how useful it is for debugging concurrency issues. So we'll use it again here. We can chuck a <code>WAITFOR DELAY 00:00:05</code> before our <code>INSERT</code> statement and execute the statement multiple times to simulate this concurrency in human-doable-times. As below...</p>
 <pre><code class="language-SQL">BEGIN TRAN
 
 DECLARE @Name VARCHAR(50) = 'A second new photo of me falling over',

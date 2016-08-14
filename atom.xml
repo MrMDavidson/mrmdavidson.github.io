@@ -3,7 +3,7 @@
   <title>Feed Name</title>
   <link href="http://domain/"/>
   <link type="application/atom+xml" rel="self" href="http://domain/atom.xml"/>
-  <updated>2016-08-14T14:20:21.0432575+10:00</updated>
+  <updated>2016-08-14T14:24:41.0017634+10:00</updated>
   <id>http://domain/</id>
   <author>
     <name>Author</name>
@@ -80,7 +80,7 @@ SELECT  @Name,
 COMMIT TRAN
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The determination of &lt;code&gt;@SortOrder&lt;/code&gt; here is a little contrived. In an actual solution you could move the standalone &lt;code&gt;SELECT&lt;/code&gt; into a sub-&lt;code&gt;SELECT&lt;/code&gt; on the &lt;code&gt;INSERT&lt;/code&gt; statement but let&apos;s just imagine that there&apos;s a constraint that requires this explicit separation. You launch the feature and after a few weeks you review the data and you notice a puzzling thing you&apos;re seeing instances where for a given &lt;code&gt;Photo.GalleryId&lt;/code&gt; there&apos;s multiple items where &lt;code&gt;Photo.SortOrder&lt;/code&gt; is duplicated. After some analysis it should be obvious what&apos;s happening; one &lt;code&gt;Photo&lt;/code&gt; is attempting to get inserted and before it can complete a second &lt;code&gt;Photo&lt;/code&gt; insertion attempt happens and evaluates &lt;code&gt;@SortOrder&lt;/code&gt; to be the same as the first.&lt;/p&gt;
-&lt;p&gt;I&apos;ve written previously about &lt;a href=&quot;/2015/09/06/sql-server-tricks.html&quot;&gt;WAITFOR&lt;/a&gt; and how useful it is for debugging concurrency issues. So we&apos;ll use it again here. We can chuck a &lt;code&gt;WAITFOR DELAY 00:00:05&lt;/code&gt; before our &lt;code&gt;INSERT&lt;/code&gt; statement and execute the statement multiple times to simulate this concurrency in human-doable-times. As below...&lt;/p&gt;
+&lt;p&gt;I&apos;ve written previously about &lt;a href=&quot;/technology/2015/09/06/sql-server-tricks.html&quot;&gt;WAITFOR&lt;/a&gt; and how useful it is for debugging concurrency issues. So we&apos;ll use it again here. We can chuck a &lt;code&gt;WAITFOR DELAY 00:00:05&lt;/code&gt; before our &lt;code&gt;INSERT&lt;/code&gt; statement and execute the statement multiple times to simulate this concurrency in human-doable-times. As below...&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&quot;language-SQL&quot;&gt;BEGIN TRAN
 
 DECLARE @Name VARCHAR(50) = &apos;A second new photo of me falling over&apos;,

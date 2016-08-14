@@ -80,7 +80,7 @@ COMMIT TRAN
 
 The determination of ```@SortOrder``` here is a little contrived. In an actual solution you could move the standalone ```SELECT``` into a sub-```SELECT``` on the ```INSERT``` statement but let's just imagine that there's a constraint that requires this explicit separation. You launch the feature and after a few weeks you review the data and you notice a puzzling thing you're seeing instances where for a given ```Photo.GalleryId``` there's multiple items where ```Photo.SortOrder``` is duplicated. After some analysis it should be obvious what's happening; one ```Photo``` is attempting to get inserted and before it can complete a second ```Photo``` insertion attempt happens and evaluates ```@SortOrder``` to be the same as the first. 
 
-I've written previously about [WAITFOR](/2015/09/06/sql-server-tricks.html) and how useful it is for debugging concurrency issues. So we'll use it again here. We can chuck a ```WAITFOR DELAY 00:00:05``` before our ```INSERT``` statement and execute the statement multiple times to simulate this concurrency in human-doable-times. As below...
+I've written previously about [WAITFOR](/technology/2015/09/06/sql-server-tricks.html) and how useful it is for debugging concurrency issues. So we'll use it again here. We can chuck a ```WAITFOR DELAY 00:00:05``` before our ```INSERT``` statement and execute the statement multiple times to simulate this concurrency in human-doable-times. As below...
 
 ```SQL
 BEGIN TRAN

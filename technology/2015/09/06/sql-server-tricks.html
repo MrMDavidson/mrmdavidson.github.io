@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		
+
+		<head>
+		<meta charset="utf-8">
+    	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+    	<meta name="viewport" content="width=device-width, initial-scale=1">
+    			
+		<meta content="en-au" http-equiv="Content-Language" />
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+		<link href="/rss.xml" type="application/rss+xml" rel="alternate" title="Blog Feed" />
+		<link href="/atom.xml" type="application/atom+xml" rel="alternate" title="Blog Feed" />
+
+		<title>SQL Server Tricks</title>
+
+		
+		<!--Bootstrap-->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">		
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+
+		<link rel="stylesheet" type="text/css" href="/css/style.css" />
+		<link rel="stylesheet" href="//cdn.jsdelivr.net/highlight.js/8.4/styles/default.min.css">
+		<link rel="shortcut icon" href="/img/favicon.ico" />
+	</head>
+
+	<body role="document">
+		<!--<div class="blog-masthead">-->
+			<!-- Fixed navbar -->
+			<nav id="top" class="navbar navbar-inverse navbar-static-top">
+				<div class="container">
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+							<span class="sr-only">Toggle navigation</span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+						<span class="navbar-brand">
+							<a href="/"><img src="/img/logo-mini.png" alt="michaeldavidson.me" /></a>
+						</span>
+						<a class="navbar-brand" href="/">michaeldavidson.me</a>
+					</div>
+					
+					<div id="navbar" class="navbar-collapse collapse">
+						<ul class="nav navbar-nav">
+							<li class="active"><a href="/">Home</a></li>
+							<li class=""><a href="/about">About</a></li>
+	
+							<!--Category Menu-->
+							<li class=" dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">By Category <span class="caret"></span></a>
+								<ul class="dropdown-menu">
+									
+										<li class=""><a href="/category/technology">Technology <span class="badge">6</span></a></li>
+									
+								</ul>
+							</li>
+							
+							
+							<!--Tag Menu-->
+							<li class=" dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">By Tags <span class="caret"></span></a>
+								<ul class="dropdown-menu">
+									
+										<li class=""><a href="/tag/algorithms">Algorithms <span class="badge">1</span></a></li>
+									
+										<li class=""><a href="/tag/blog">Blog <span class="badge">2</span></a></li>
+									
+										<li class=""><a href="/tag/c-sharp">C-Sharp <span class="badge">1</span></a></li>
+									
+										<li class=""><a href="/tag/pretzel">Pretzel <span class="badge">2</span></a></li>
+									
+										<li class=""><a href="/tag/sql">Sql <span class="badge">2</span></a></li>
+									
+										<li class=""><a href="/tag/web">Web <span class="badge">1</span></a></li>
+									
+								</ul>
+							</li>
+						</ul>
+					</div><!--/.nav-collapse -->
+				</div>
+			</nav>
+		<!--</div>-->
+		
+		<div class="container">
+			<div class="container">
+	<div class="row">
+		<div class="col-md-8">
+			<h1>
+				SQL Server Tricks
+				
+					<small> 6 September, 2015</small>
+				
+			</h1>
+			
+				<ol class="breadcrumb">
+					<li><a href="/">Home</a></li>
+					
+						<li>
+						
+							<a href="/category/technology">Technology</a>
+						
+						</li>
+					
+					
+						<li>	
+						
+							<a href="/tag/sql">Sql</a>
+						
+						</li>
+						
+				</ol>
+			
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-8">
+			<p>Throughout my career I've spent more than my fair share of time in the database layer. There's a current trent in the .Net world of just letting your ORM take care of everything in the data layer for you. I'm a huge proponent of using an ORM for mapping (at work we're currently using StackExchange's <a href="https://github.com/StackExchange/dapper-dot-net">Dapper.net</a>). However I've always been a little wary of letting the ORM do everything for you. As such I thought I'd jot down a few handy SQL Server tricks I've picked up over the years.</p>
+<h3>1. The Output Clause</h3>
+<p>The <a href="https://msdn.microsoft.com/en-us/library/ms177564.aspx"><code>OUTPUT</code> clause</a> let's you execute a data modification statement and have it project a result set. In plain English that means that you can perform a <code>DELETE</code>, <code>INSERT</code> or <code>UPDATE</code> <strong>and</strong> have it return a resultset. This has been around since SQL Server 2008 but doesn't seem to get much attention. An example might be;</p>
+<pre><code class="language-SQL">UPDATE  Customers
+SET     Archived = 1
+OUTPUT  DELETED.Id,
+        DELETED.EmailAddress
+WHERE   RecentlyLoggedIn = 0
+</code></pre>
+<p>In one, atomic, operation this would mark all customer who have not recently logged in as archived as well as returning the customer id and email address for all those customers. I've seen this often implemented as something along the lines of</p>
+<pre><code class="language-SQL">SELECT  C.Id,
+        C.EmailAddress
+FROM    Customers C
+WHERE   C.RecentlyLoggedIn = 0
+
+UPDATE  Customers
+SET     Archived = 1
+WHERE   RecentlyLoggedIn = 0
+</code></pre>
+<p>However, depending on your locking model applied, another process could come along and change the status of <code>RecentlyLoggedIn</code> between the two statements. This won't happen with the original statement I provided. It also means that the entire operation can be rolled back as a transactional unit of work.</p>
+<p>It's worth noting that with the <code>OUTPUT</code> clause you get access to both an <code>INSERTED</code> and a <code>DELETED</code> psuedo-table to operate on. You can think of the <code>INSERTED</code> table as the &quot;new&quot; view of the data after the operation has finished (Only applicable with <code>UPDATE</code>, <code>INSERT</code> and <code>MERGE</code>) statements and the <code>DELETED</code> table as the view before the operation was executed (Only applicable with the <code>UPDATE</code>, <code>DELETE</code> and <code>MERGE</code> operation).</p>
+<h3>2. <code>READPAST</code> and <code>ROWLOCK</code> locking hints</h3>
+<p>Both of these <a href="https://msdn.microsoft.com/en-us/library/ms187373.aspx">locking hints</a> have been available since SQL Server 2008 and work very well together.</p>
+<p>First the <code>ROWLOCK</code> hint tells SQL Server to, where possible, use a row level lock instead of a page or table lock. This means that instead of locking an entire table, or index page, SQL Server will minimise the locking to only the affected row(s).</p>
+<pre><code class="language-SQL">UPDATE  Customers WITH (ROWLOCK)
+SET     CustomerEmailed = 1
+WHERE   Archived = 1
+AND     CustomerEmailed = 0
+</code></pre>
+<p><code>READPAST</code>, available since SQL Server 2008, instructs SQL Server that if a row in the dataset has a row level lock applied to skip past it. This can be very handy when performing any kind of queue based work. Suppose we have</p>
+<pre><code class="language-SQL">SELECT  C.Id,
+        C.Email
+FROM    Customers C WITH (READPAST)
+WHERE   Archived = 1
+AND     CustomerEmailed = 1
+</code></pre>
+<p>If this was executed whilst the <code>ROWLOCK</code> example was executing it would only return those rows where <code>Archived = 1</code> and <code>CustomerEmailed = 1</code> was true <em>before</em> the first transaction started executing. It's important to note that this means that any locked row is completely ignored from the resultset! Let me reiterate that; If a row is currently locked it will not be in the produced output, even though it would (once any locks are released) appear in the resultset. Depending on what you're doing this is very powerful... but if you're not aware of it you may introduce subtle, transient, bugs. So be careful.</p>
+<h3>3. <code>RAISERROR ... WITH NOWAIT</code></h3>
+<p><a href="https://msdn.microsoft.com/en-us/library/ms178592.aspx"><code>RAISERROR .. WITH NOWAIT</code></a> let's you flush a message to SQL Server Management Studio immediately rather than waiting until the end of the batch. This is useful when you're testing locking to track which statement is causing the execution to block</p>
+<pre><code class="language-SQL">RAISERROR('Hello world', 0, 1) WITH NOWAIT
+</code></pre>
+<h3>4. Testing Locks</h3>
+<p>The final quick tip is how you can test locks. Getting things to run at just the right time can be very tricky and the application of appropriate locking hints is highly dependent on a number of factors (indexes involved, the query analyzer, foreign keys, the statement, etc). So when it comes to testing how locks interact with each other one of the simplest tools is the <a href="https://msdn.microsoft.com/en-us/library/ms187331.aspx"><code>WAITFOR DELAY</code></a> expression. This makes SQL Server pause execution of your query until the time elapses. Eg. <code>WAITFOR DELAY '0:00:10'</code> would wait for 10 seconds to elapse. Using this trick you can construct queries which emulate longer running tasks or concurrent operations.</p>
+<p>To better illustrate all of this we'll create the simple table used throughout these examples and populate it</p>
+<pre><code class="language-SQL">CREATE TABLE Customers (
+    [Id] [int] IDENTITY(1,1) PRIMARY KEY NOT NULL,
+    [Email] [varchar](250) NULL,
+    [Archived] [bit] NULL,
+    [CustomerEmailed] [bit] NULL,
+)
+GO
+
+INSERT INTO Customers (Email, Archived, CustomerEmailed)
+SELECT  'user1@domain.com', 0, 0
+UNION ALL
+SELECT  'user2@domain.com', 1, 1
+UNION ALL
+SELECT  'user3@domain.com', 1, 0
+UNION ALL
+SELECT  'user4@domain.com', 0, 1
+</code></pre>
+<p><img src="/img/posts/2015-09-06-sql-server-tricks/sample-data.png" alt="Sample Data" title="Sample Data" /></p>
+<p>Now we'll run two different queries. The first one mark any customers as emailed that have not yet been emailed but are archived. It'll then return this recordset to the calling code. You can imagine in an actual application exeucting this statement, looping over the resultset, and emailing the associated customers. To simulate the work of emailing the customer we'll make use of the <code>WAITFOR... DELAY</code> statement we mentioned earlier.</p>
+<pre><code class="language-SQL">BEGIN TRAN
+
+RAISERROR('Executing update', 0, 1) WITH NOWAIT
+
+UPDATE  Customers WITH (ROWLOCK)
+SET     CustomerEmailed = 1
+OUTPUT  INSERTED.Id,
+        INSERTED.Email
+WHERE   Archived = 1
+AND     CustomerEmailed = 0
+
+RAISERROR('Update finished', 0, 1) WITH NOWAIT
+
+WAITFOR DELAY '00:00:10'
+
+RAISERROR('Work finished', 0, 1) WITH NOWAIT
+
+ROLLBACK TRAN
+</code></pre>
+<p>Go ahead and run this. After 10s you'll get the results. You may not see the actual result sets until the 10s delay has elapsed but if you switch to the <code>Messages</code> tab instead of the <code>Results</code> tab you'll see it straight away printint out the &quot;Executing update&quot; and &quot;Update finished&quot; messages. The second query we'll execute will select those customers who have been emailed.</p>
+<pre><code class="language-SQL">BEGIN TRAN
+
+RAISERROR('Selecting with READPAST', 0, 1) WITH NOWAIT
+
+SELECT  *
+FROM    Customers WITH (READPAST)
+WHERE   CustomerEmailed = 1
+
+RAISERROR('Selecting without READPAST', 0, 1) WITH NOWAIT
+
+SELECT  *
+FROM    Customers
+WHERE   CustomerEmailed = 1
+
+RAISERROR('Executing update', 0, 1) WITH NOWAIT
+
+ROLLBACK TRAN
+</code></pre>
+<p>If we execute this at the same time as the first query you will immediately get back the list of customers. And then, once the first query has finished, you'll get the second resultset. One thing to note is that if the first transaction committed you would get back <strong>3</strong> customers in the second resultset but still only <strong>2</strong> customer in the first resultset.</p>
+<p><img src="/img/posts/2015-09-06-sql-server-tricks/running-queries.png" alt="Whilst executing" title="Whilst executing" />
+Whilst both queries are executing you'll see something output something like this. Note that the lefthand side has generated its resultset as has the <code>READPAST</code> query on the right hand side. But the second resultset on the right hasn't generated yet.</p>
+<p><img src="/img/posts/2015-09-06-sql-server-tricks/ran-queries.png" alt="Finished executing" title="Finished executing" /></p>
+<p>Once the <code>WAITFOR DELAY</code> has finished (and any work is committed or rolled back) the second resultset on the right will generate. You can verify that by running <code>sp_who2 'active'</code> while both are running.</p>
+<p><img src="/img/posts/2015-09-06-sql-server-tricks/blocked-by.png" alt="sp_who2" title="Blocked By" />
+Here we can see that the right hand query, SPID 52, is currently blocked by SPID 53, which is the left hand side.</p>
+<p>Hope you find these little tips helpful!</p>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-8" id="page-navigation"> 
+			<div class="left">  </div> 
+			<div class="right">  </div> 
+			<div class="clear">&nbsp;</div>
+		</div> 
+	</div>
+	
+	
+	
+	<div id="disqus_thread"></div>
+	<script type="text/javascript">
+		/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+		var disqus_shortname = 'mrmdavidson'; // required: replace example with your forum shortname
+		/* * * DON'T EDIT BELOW THIS LINE * * */
+		(function() {
+			var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+			dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+			(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+		})();
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+	<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+	
+</div>
+		</div>
+
+		<footer>
+			<ul class="list-inline">
+				<li><a href="https://twitter.com/mrmdavidson">@mrmdavidson</a></li>
+				<li><a href="https://github.com/MrMDavidson">Github</a></li>
+				<li><a href="http://stackoverflow.com/users/150728/mrmdavidson">StackOverflow</a></li>
+				<li><a href="mailto:me@michaeldavidson.me">me@michaeldavidson.me</a></li>
+				<li><a href="/rss.xml"><img src="/img/25.png" />&nbsp;RSS feed</a></li>
+			</ul>
+			
+			<p><a href="#top">Back to top</a></p>
+		</footer>
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+		
+		<!-- Bootstrap -->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>	
+		
+		<script src="//cdn.jsdelivr.net/highlight.js/8.4/highlight.min.js"></script>
+		<script>hljs.initHighlightingOnLoad();</script>
+		
+		<script>
+  			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+			ga('create', 'UA-67005498-1', 'auto');
+			ga('send', 'pageview');
+		</script>
+	</body>
+</html>

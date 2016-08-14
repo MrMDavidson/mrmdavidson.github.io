@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		
+
+		<head>
+		<meta charset="utf-8">
+    	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+    	<meta name="viewport" content="width=device-width, initial-scale=1">
+    			
+		<meta content="en-au" http-equiv="Content-Language" />
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+		<link href="/rss.xml" type="application/rss+xml" rel="alternate" title="Blog Feed" />
+		<link href="/atom.xml" type="application/atom+xml" rel="alternate" title="Blog Feed" />
+
+		<title>SQL Server: Locking Parent Tables</title>
+
+		
+		<!--Bootstrap-->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">		
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+
+		<link rel="stylesheet" type="text/css" href="/css/style.css" />
+		<link rel="stylesheet" href="//cdn.jsdelivr.net/highlight.js/8.4/styles/default.min.css">
+		<link rel="shortcut icon" href="/img/favicon.ico" />
+	</head>
+
+	<body role="document">
+		<!--<div class="blog-masthead">-->
+			<!-- Fixed navbar -->
+			<nav id="top" class="navbar navbar-inverse navbar-static-top">
+				<div class="container">
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+							<span class="sr-only">Toggle navigation</span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+						<span class="navbar-brand">
+							<a href="/"><img src="/img/logo-mini.png" alt="michaeldavidson.me" /></a>
+						</span>
+						<a class="navbar-brand" href="/">michaeldavidson.me</a>
+					</div>
+					
+					<div id="navbar" class="navbar-collapse collapse">
+						<ul class="nav navbar-nav">
+							<li class="active"><a href="/">Home</a></li>
+							<li class=""><a href="/about">About</a></li>
+	
+							<!--Category Menu-->
+							<li class=" dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">By Category <span class="caret"></span></a>
+								<ul class="dropdown-menu">
+									
+										<li class=""><a href="/category/technology">Technology <span class="badge">6</span></a></li>
+									
+								</ul>
+							</li>
+							
+							
+							<!--Tag Menu-->
+							<li class=" dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">By Tags <span class="caret"></span></a>
+								<ul class="dropdown-menu">
+									
+										<li class=""><a href="/tag/algorithms">Algorithms <span class="badge">1</span></a></li>
+									
+										<li class=""><a href="/tag/blog">Blog <span class="badge">2</span></a></li>
+									
+										<li class=""><a href="/tag/c-sharp">C-Sharp <span class="badge">1</span></a></li>
+									
+										<li class=""><a href="/tag/pretzel">Pretzel <span class="badge">2</span></a></li>
+									
+										<li class=""><a href="/tag/sql">Sql <span class="badge">2</span></a></li>
+									
+										<li class=""><a href="/tag/web">Web <span class="badge">1</span></a></li>
+									
+								</ul>
+							</li>
+						</ul>
+					</div><!--/.nav-collapse -->
+				</div>
+			</nav>
+		<!--</div>-->
+		
+		<div class="container">
+			<div class="container">
+	<div class="row">
+		<div class="col-md-8">
+			<h1>
+				SQL Server: Locking Parent Tables
+				
+					<small>14 August, 2016</small>
+				
+			</h1>
+			
+				<ol class="breadcrumb">
+					<li><a href="/">Home</a></li>
+					
+						<li>
+						
+							<a href="/category/technology">Technology</a>
+						
+						</li>
+					
+					
+						<li>	
+						
+							<a href="/tag/sql">Sql</a>
+						
+						</li>
+						
+				</ol>
+			
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-8">
+			<p>A while back I came across a problem a concurrency issue at work that took several iterations to determine an appropriate fix for. The basic problem was that we had a table representing a parent entity and a dependent child entity. The child entity had an integer column to specify the sort ordering of the children within the parent. For a more concrete example imagine a photo management application. You may have a gallery entity (the parent) which contains a list of photos (the child entity) which can be re-arranged by the user.</p>
+<p>For the sake of simplicity we'll strip down a lot of the properties on these entities to the bare essentials required for our example.</p>
+<pre><code class="language-SQL">CREATE TABLE Gallery (
+    Id INTEGER IDENTITY(1,1) PRIMARY KEY,
+    Name VARCHAR(50) NOT NULL
+)
+
+CREATE TABLE Photo (
+    Id INTEGER IDENTITY(1, 1) PRIMARY KEY,
+    Name VARCHAR(50) NOT NULL,
+    GalleryId INT NOT NULL,
+    SortOrder INT NOT NULL,
+    CONSTRAINT FK_Photo_GalleryId_Gallery_Id FOREIGN KEY (GalleryId) REFERENCES Gallery (Id)
+)
+</code></pre>
+<p>Let's populate the tables with some sample data;</p>
+<pre><code class="language-SQL">SET IDENTITY_INSERT Gallery ON
+INSERT INTO Gallery (Id, Name) VALUES (1, 'Ski trip')
+SET IDENTITY_INSERT Gallery OFF
+
+SET IDENTITY_INSERT Photo ON  
+INSERT INTO Photo (Id, Name, GalleryId, SortOrder) VALUES (1, 'Me falling over', 1, 0)
+INSERT INTO Photo (Id, Name, GalleryId, SortOrder) VALUES (2, 'Me falling over... again', 1, 1)
+INSERT INTO Photo (Id, Name, GalleryId, SortOrder) VALUES (3, 'Still falling over...', 1, 2)
+SET IDENTITY_INSERT Photo OFF
+</code></pre>
+<p>You can imagine a simple query to retrieve the <code>Photo</code>s in a <code>Gallery</code> as being something like;</p>
+<pre><code class="language-SQL">DECLARE @GalleryId INT = 1
+
+SELECT  P.*
+FROM    Photo P
+WHERE   P.GalleryId = @GalleryId
+ORDER
+BY      P.SortOrder
+</code></pre>
+<p>Pretty simple stuff. To be honest we don't really care if the first <code>Photo</code> in a gallery has a <code>SortOrder</code> of 0 or 10 or -20. As long as its value is less than the second <code>Photo</code>'s <code>SortOrder</code> every thing is fine. So all we need to do is when we insert a new <code>Photo</code> we insert it with a value greater than any other <code>Photo</code>. Great! Let's have a crack at writing an <code>INSERT</code> for this scenario;</p>
+<pre><code class="language-SQL">BEGIN TRAN
+
+DECLARE @Name VARCHAR(50) = 'A new photo of me falling over',
+        @GalleryId INT = 1,
+        @SortOrder INT = NULL
+
+SELECT  @SortOrder = MAX(P.SortOrder) + 1
+FROM    Photo P
+WHERE   P.GalleryId = @GalleryId
+
+SELECT  @SortOrder = ISNULL(@SortOrder, 0)
+
+INSERT INTO Photo (
+        Name,
+        GalleryId,
+        SortOrder
+)
+SELECT  @Name,
+        @GalleryId,
+        @SortOrder
+
+COMMIT TRAN
+</code></pre>
+<p>The determination of <code>@SortOrder</code> here is a little contrived. In an actual solution you could move the standalone <code>SELECT</code> into a sub-<code>SELECT</code> on the <code>INSERT</code> statement but let's just imagine that there's a constraint that requires this explicit separation. You launch the feature and after a few weeks you review the data and you notice a puzzling thing you're seeing instances where for a given <code>Photo.GalleryId</code> there's multiple items where <code>Photo.SortOrder</code> is duplicated. After some analysis it should be obvious what's happening; one <code>Photo</code> is attempting to get inserted and before it can complete a second <code>Photo</code> insertion attempt happens and evaluates <code>@SortOrder</code> to be the same as the first.</p>
+<p>I've written previously about <a href="/2015/09/06/sql-server-tricks.html">WAITFOR</a> and how useful it is for debugging concurrency issues. So we'll use it again here. We can chuck a <code>WAITFOR DELAY 00:00:05</code> before our <code>INSERT</code> statement and execute the statement multiple times to simulate this concurrency in human-doable-times. As below...</p>
+<pre><code class="language-SQL">BEGIN TRAN
+
+DECLARE @Name VARCHAR(50) = 'A second new photo of me falling over',
+        @GalleryId INT = 1,
+        @SortOrder INT = NULL
+
+SELECT  @SortOrder = MAX(P.SortOrder) + 1
+FROM    Photo P
+WHERE   P.GalleryId = @GalleryId
+
+SELECT  @SortOrder = ISNULL(@SortOrder, 0)
+
+WAITFOR DELAY '00:00:05'
+
+INSERT INTO Photo (
+        Name,
+        GalleryId,
+        SortOrder
+)
+SELECT  @Name,
+        @GalleryId,
+        @SortOrder
+
+COMMIT TRAN
+
+SELECT  *
+FROM    Photo 
+WHERE   GalleryId = @GalleryId
+</code></pre>
+<p>What we're going to do is run this statement twice. Once with the <code>WAITFOR</code> and once without. You want to run the statement with the <code>WAITFOR</code> and then wait a second or two before running the version without the <code>WAITFOR</code>.</p>
+<p><img src="/img/posts/2016-08-14-sql-server-locking-parent-tables/insert-query-duplicate-results.png" alt="Insert Spurious Data" title="Insert Spurious Data" /></p>
+<p>In this example I've ran the statement on the left handside, waited a second or two, and then ran the statement on the right hand side. You can see the left hand side results shows the two <code>Photo</code> entities with a <code>SortOrder</code> of 3. Not what we want. What we need to do is take a lock on <code>Photo</code> of some kind so that concurrent statements are blocked until this statement returns. We don't want a <code>TABLOCK</code> or <code>TABLOCKX</code> as those are too coarse grained. We can instead try an <a href="https://msdn.microsoft.com/en-us/library/ms187373.aspx">UPDLOCK</a> which takes a lock until the entire transaction competes (not just the statement). Let's update our insertion statement appropriately...</p>
+<pre><code class="language-SQL">BEGIN TRAN
+
+DECLARE @Name VARCHAR(50) = 'A second new photo of me falling over',
+        @GalleryId INT = 1,
+        @SortOrder INT = NULL
+
+SELECT  @SortOrder = MAX(P.SortOrder) + 1
+FROM    Photo P (UPDLOCK)
+WHERE   P.GalleryId = @GalleryId
+
+SELECT  @SortOrder = ISNULL(@SortOrder, 0)
+
+WAITFOR DELAY '00:00:05'
+
+INSERT INTO Photo (
+        Name,
+        GalleryId,
+        SortOrder
+)
+SELECT  @Name,
+        @GalleryId,
+        @SortOrder
+
+COMMIT TRAN
+
+SELECT  *
+FROM    Photo 
+WHERE   GalleryId = @GalleryId
+</code></pre>
+<p>Now we'll re-run our two statements side by side again (I've truncated the <code>Photo</code> table and re-inserted the initial data)</p>
+<p><img src="/img/posts/2016-08-14-sql-server-locking-parent-tables/insert-query-updlock.png" alt="Insert with UPDLOCK" title="Insert with UPDLOCK" /></p>
+<p>Hooray! We now get the correct results; all items have unique <code>Photo.SortOrder</code> values. As per before the left hand side query was executed and then, a few seconds later, I executed the right hand side. One thing to note here is that, as I mentioned, the UPDLOCK takes the lock until the transaction completes. As such the right hand side now takes 3 seconds to complete (as it has to wait for the left hand side's <code>WAITFOR</code>). At this stage you're probably pretty pleased with yourself. So you quickly patch the feature, roll it to production, and pat yourself on the back.</p>
+<p>A few weeks pass someone notices that, again, there's duplicate <code>Photo.SortOrder</code> values for a given <code>Photo.GalleryId</code>. But we just fixed this! Upon further investigation you notice that the duplicate values are always zero. That's... interesting you think. Why would that be the case? They duplicate values are always zero so it's probably something to do with a new <code>Gallery</code>. Let's create a new <code>Gallery</code>;</p>
+<pre><code class="language-SQL">INSERT INTO Gallery (Name) VALUES ('Kittens')
+</code></pre>
+<p>Now we'll re-run our <code>INSERT</code> statements, with the <code>UPDLOCK</code>, from earlier. Only now for <code>@GalleryId = 2</code>.</p>
+<p><img src="/img/posts/2016-08-14-sql-server-locking-parent-tables/insert-query-updlock-empty-gallery.png" alt="Insert with UPDLOCK into an empty Gallery" title="Insert with UPDLOCK into an empty Gallery" /></p>
+<p>Ahar! We reproduced the issue. We've ended up with two <code>Image.SortOrder</code> values of 0. Looking at this a bit closer you'll also notice that, like our initial <code>INSERT</code>, the right hand side in this query has returned immediately. It no longer waits for the left hand side to execute. But there's an <code>UPDLOCK</code>! Shouldn't it be blocking the right hand side query? Well, unfortunately, because there's no items SQL Server has nothing to actually lock until the transaction completes. This allows the right hand side to execute before the left hand side has inserted the record. We could modify the <code>UPDLOCK</code> to be a <code>TABLOCK</code> or <code>TABLOCKX</code> but then if I'm inserting into Gallery A I'm blocked by someone else inserting into Gallery B which is less than ideal. Unfortunate because this <code>UPDLOCK</code> version is nice and granular... but it's no use to us if we have nothing to lock on. Unless... the <code>Photo</code> always belongs to a <code>Gallery</code>, right? And it has a foreign key to <code>Gallery</code> ensuring this is true. Instead of locking the <code>Photo</code> can we lock the <code>Gallery</code>? Let's try...</p>
+<p>First we'll create a new <code>Gallery</code></p>
+<pre><code class="language-SQL">INSERT INTO Gallery (Name) VALUES ('Puppies')
+</code></pre>
+<p>Now we'll re-work our <code>INSERT</code> statement to lock the <code>Gallery</code>;</p>
+<pre><code class="language-SQL">BEGIN TRAN
+
+DECLARE @Name VARCHAR(50) = 'A small puppy',
+        @GalleryId INT = 3,
+        @SortOrder INT = NULL,
+        @Locked BIT = 0
+
+SELECT  @Locked = 1
+FROM    Gallery G WITH (UPDLOCK, ROWLOCK)
+WHERE   G.Id = @GalleryId
+
+SELECT  @SortOrder = MAX(P.SortOrder) + 1
+FROM    Photo P
+WHERE   P.GalleryId = @GalleryId
+
+SELECT  @SortOrder = ISNULL(@SortOrder, 0)
+
+WAITFOR DELAY '00:00:05'
+
+INSERT INTO Photo (
+        Name,
+        GalleryId,
+        SortOrder
+)
+SELECT  @Name,
+        @GalleryId,
+        @SortOrder
+
+COMMIT TRAN
+
+SELECT  *
+FROM    Photo 
+WHERE   GalleryId = @GalleryId
+</code></pre>
+<p><img src="/img/posts/2016-08-14-sql-server-locking-parent-tables/insert-query-gallery-updlock-empty-gallery.png" alt="Insert with UPDLOCK on Gallery into an empty Gallery" title="Insert with UPDLOCK on Gallery into an empty Gallery" /></p>
+<p>And... success! Once again the right hand side has taken a few seconds to execute as it waits for the left hand side to complete before it can acquire the <code>UPDLOCK</code> on <code>Gallery</code>. And once again we have unique values of <code>Photo.SortOrder</code> as we required. We've also introduced the <code>ROWLOCK</code> hint to indicate we only want to lock the rows returned by the <code>SELECT</code> on <code>Gallery</code>. Depending on your index applied this shouldn't be necessary but I've not encountered any issues hinting you only want to lock the row. Between these two hints this ensures that whilst the right hand side took several seconds to complete it is only because it was inserting into the same <code>Gallery</code> as the left hand side. If you were to insert into a different gallery it'd return instantly.</p>
+<p>I've been running this style of locking model for several months in a production environment and it has completely removed the data duplication we were experiencing. Whilst there's other methods you could use to eliminate the source of error this one ended up working for me and is also easy to verify the behaviour.</p>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-8" id="page-navigation"> 
+			<div class="left">  </div> 
+			<div class="right">  </div> 
+			<div class="clear">&nbsp;</div>
+		</div> 
+	</div>
+	
+	
+	
+	<div id="disqus_thread"></div>
+	<script type="text/javascript">
+		/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+		var disqus_shortname = 'mrmdavidson'; // required: replace example with your forum shortname
+		/* * * DON'T EDIT BELOW THIS LINE * * */
+		(function() {
+			var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+			dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+			(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+		})();
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+	<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+	
+</div>
+		</div>
+
+		<footer>
+			<ul class="list-inline">
+				<li><a href="https://twitter.com/mrmdavidson">@mrmdavidson</a></li>
+				<li><a href="https://github.com/MrMDavidson">Github</a></li>
+				<li><a href="http://stackoverflow.com/users/150728/mrmdavidson">StackOverflow</a></li>
+				<li><a href="mailto:me@michaeldavidson.me">me@michaeldavidson.me</a></li>
+				<li><a href="/rss.xml"><img src="/img/25.png" />&nbsp;RSS feed</a></li>
+			</ul>
+			
+			<p><a href="#top">Back to top</a></p>
+		</footer>
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+		
+		<!-- Bootstrap -->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>	
+		
+		<script src="//cdn.jsdelivr.net/highlight.js/8.4/highlight.min.js"></script>
+		<script>hljs.initHighlightingOnLoad();</script>
+		
+		<script>
+  			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+			ga('create', 'UA-67005498-1', 'auto');
+			ga('send', 'pageview');
+		</script>
+	</body>
+</html>

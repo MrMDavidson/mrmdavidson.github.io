@@ -53,7 +53,7 @@
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">By Category <span class="caret"></span></a>
 								<ul class="dropdown-menu">
 									
-										<li class=""><a href="/category/technology">Technology <span class="badge">5</span></a></li>
+										<li class=""><a href="/category/technology">Technology <span class="badge">6</span></a></li>
 									
 								</ul>
 							</li>
@@ -72,7 +72,7 @@
 									
 										<li class=""><a href="/tag/pretzel">Pretzel <span class="badge">2</span></a></li>
 									
-										<li class="active"><a href="/tag/sql">Sql <span class="badge">1</span></a></li>
+										<li class="active"><a href="/tag/sql">Sql <span class="badge">2</span></a></li>
 									
 										<li class=""><a href="/tag/web">Web <span class="badge">1</span></a></li>
 									
@@ -102,7 +102,27 @@
             
                 
                 
-                    <h2><a href="/2015/09/06/sql-server-tricks/">SQL Server Tricks</a>
+                    <h2><a href="/technology/2016/08/14/sql-server-locking-parent-tables.html">SQL Server: Locking Parent Tables</a>
+                        
+                            <small>2016-08-14</small>
+                        
+                    </h2>
+                    <p><p>A while back I came across a problem a concurrency issue at work that took several iterations to determine an appropriate fix for. The basic problem was that we had a table representing a parent entity and a dependent child entity. The child entity had an integer column to specify the sort ordering of the children within the parent. For a more concrete example imagine a photo management application. You may have a gallery entity (the parent) which contains a list of photos (the child entity) which can be re-arranged by the user.</p>
+<p>For the sake of simplicity we'll strip down a lot of the properties on these entities to the bare essentials required for our example.</p>
+<pre><code class="language-SQL">CREATE TABLE Gallery (
+    Id INTEGER IDENTITY(1,1) PRIMARY KEY,
+    Name VARCHAR(50) NOT NULL
+)
+
+CREATE TABLE Photo (
+    Id INTEGER IDENTITY(1, 1) PRIMARY KEY,
+    Name VARCHAR(50) NOT NULL,
+    GalleryId INT NOT NULL,
+    SortOrder INT NOT NULL,
+    CONSTRAINT FK_Ph...</p>
+                    <p class="text-right"><a href="/technology/2016/08/14/sql-server-locking-parent-tables.html">read more...</a></p>
+                
+                    <h2><a href="/technology/2015/09/06/sql-server-tricks.html">SQL Server Tricks</a>
                         
                             <small>2015-09-06</small>
                         
@@ -110,7 +130,7 @@
                     <p><p>Throughout my career I've spent more than my fair share of time in the database layer. There's a current trent in the .Net world of just letting your ORM take care of everything in the data layer for you. I'm a huge proponent of using an ORM for mapping (at work we're currently using StackExchange's <a href="https://github.com/StackExchange/dapper-dot-net">Dapper.net</a>). However I've always been a little wary of letting the ORM do everything for you. As such I thought I'd jot down a few handy SQL Server tricks I've picked up over the years.</p>
 <h3>1. The Output Clause</h3>
 <p>The <a href="https://msdn.microsoft.com/en-us/library/ms177564.aspx"><code>OUTPUT</code> clause</a> let's you execute a data modification statement and have it project a result set. In plain English that means that you can perform a <code>DELETE</code>, <code>INSERT</code> or <code>UPDATE</code> <strong>and</strong> have it return a resultset. This has been around since SQL Server 2008 but doesn't seem ...</p>
-                    <p class="text-right"><a href="/2015/09/06/sql-server-tricks/">read more...</a></p>
+                    <p class="text-right"><a href="/technology/2015/09/06/sql-server-tricks.html">read more...</a></p>
                 
             
         

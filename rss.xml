@@ -6,15 +6,195 @@
     <atom:link href="http://michaeldavidson.me/rss.xml" rel="self" type="application/rss+xml" />
     <description></description>
     <language>en-au</language>
-    <pubDate>Tue, 06 Oct 2015 23:46:28 %z</pubDate>
-    <lastBuildDate>Tue, 06 Oct 2015 23:46:28 %z</lastBuildDate>
+    <pubDate>Sun, 14 Aug 2016 14:20:21 %z</pubDate>
+    <lastBuildDate>Sun, 14 Aug 2016 14:20:21 %z</lastBuildDate>
+    
+    <item>
+      <title>SQL Server: Locking Parent Tables</title>
+      <link>http://michaeldavidson.me/technology/2016/08/14/sql-server-locking-parent-tables.html</link>
+      <pubDate>Sun, 14 Aug 2016 00:00:00 %z</pubDate>
+      <author>Author</author>
+      <guid>http://michaeldavidson.me/technology/2016/08/14/sql-server-locking-parent-tables.html</guid>
+      <description>&lt;p&gt;A while back I came across a problem a concurrency issue at work that took several iterations to determine an appropriate fix for. The basic problem was that we had a table representing a parent entity and a dependent child entity. The child entity had an integer column to specify the sort ordering of the children within the parent. For a more concrete example imagine a photo management application. You may have a gallery entity (the parent) which contains a list of photos (the child entity) which can be re-arranged by the user.&lt;/p&gt;
+&lt;p&gt;For the sake of simplicity we&apos;ll strip down a lot of the properties on these entities to the bare essentials required for our example.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-SQL&quot;&gt;CREATE TABLE Gallery (
+    Id INTEGER IDENTITY(1,1) PRIMARY KEY,
+    Name VARCHAR(50) NOT NULL
+)
+
+CREATE TABLE Photo (
+    Id INTEGER IDENTITY(1, 1) PRIMARY KEY,
+    Name VARCHAR(50) NOT NULL,
+    GalleryId INT NOT NULL,
+    SortOrder INT NOT NULL,
+    CONSTRAINT FK_Photo_GalleryId_Gallery_Id FOREIGN KEY (GalleryId) REFERENCES Gallery (Id)
+)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Let&apos;s populate the tables with some sample data;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-SQL&quot;&gt;SET IDENTITY_INSERT Gallery ON
+INSERT INTO Gallery (Id, Name) VALUES (1, &apos;Ski trip&apos;)
+SET IDENTITY_INSERT Gallery OFF
+
+SET IDENTITY_INSERT Photo ON  
+INSERT INTO Photo (Id, Name, GalleryId, SortOrder) VALUES (1, &apos;Me falling over&apos;, 1, 0)
+INSERT INTO Photo (Id, Name, GalleryId, SortOrder) VALUES (2, &apos;Me falling over... again&apos;, 1, 1)
+INSERT INTO Photo (Id, Name, GalleryId, SortOrder) VALUES (3, &apos;Still falling over...&apos;, 1, 2)
+SET IDENTITY_INSERT Photo OFF
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;You can imagine a simple query to retrieve the &lt;code&gt;Photo&lt;/code&gt;s in a &lt;code&gt;Gallery&lt;/code&gt; as being something like;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-SQL&quot;&gt;DECLARE @GalleryId INT = 1
+
+SELECT  P.*
+FROM    Photo P
+WHERE   P.GalleryId = @GalleryId
+ORDER
+BY      P.SortOrder
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Pretty simple stuff. To be honest we don&apos;t really care if the first &lt;code&gt;Photo&lt;/code&gt; in a gallery has a &lt;code&gt;SortOrder&lt;/code&gt; of 0 or 10 or -20. As long as its value is less than the second &lt;code&gt;Photo&lt;/code&gt;&apos;s &lt;code&gt;SortOrder&lt;/code&gt; every thing is fine. So all we need to do is when we insert a new &lt;code&gt;Photo&lt;/code&gt; we insert it with a value greater than any other &lt;code&gt;Photo&lt;/code&gt;. Great! Let&apos;s have a crack at writing an &lt;code&gt;INSERT&lt;/code&gt; for this scenario;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-SQL&quot;&gt;BEGIN TRAN
+
+DECLARE @Name VARCHAR(50) = &apos;A new photo of me falling over&apos;,
+        @GalleryId INT = 1,
+        @SortOrder INT = NULL
+
+SELECT  @SortOrder = MAX(P.SortOrder) + 1
+FROM    Photo P
+WHERE   P.GalleryId = @GalleryId
+
+SELECT  @SortOrder = ISNULL(@SortOrder, 0)
+
+INSERT INTO Photo (
+        Name,
+        GalleryId,
+        SortOrder
+)
+SELECT  @Name,
+        @GalleryId,
+        @SortOrder
+
+COMMIT TRAN
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The determination of &lt;code&gt;@SortOrder&lt;/code&gt; here is a little contrived. In an actual solution you could move the standalone &lt;code&gt;SELECT&lt;/code&gt; into a sub-&lt;code&gt;SELECT&lt;/code&gt; on the &lt;code&gt;INSERT&lt;/code&gt; statement but let&apos;s just imagine that there&apos;s a constraint that requires this explicit separation. You launch the feature and after a few weeks you review the data and you notice a puzzling thing you&apos;re seeing instances where for a given &lt;code&gt;Photo.GalleryId&lt;/code&gt; there&apos;s multiple items where &lt;code&gt;Photo.SortOrder&lt;/code&gt; is duplicated. After some analysis it should be obvious what&apos;s happening; one &lt;code&gt;Photo&lt;/code&gt; is attempting to get inserted and before it can complete a second &lt;code&gt;Photo&lt;/code&gt; insertion attempt happens and evaluates &lt;code&gt;@SortOrder&lt;/code&gt; to be the same as the first.&lt;/p&gt;
+&lt;p&gt;I&apos;ve written previously about &lt;a href=&quot;/2015/09/06/sql-server-tricks.html&quot;&gt;WAITFOR&lt;/a&gt; and how useful it is for debugging concurrency issues. So we&apos;ll use it again here. We can chuck a &lt;code&gt;WAITFOR DELAY 00:00:05&lt;/code&gt; before our &lt;code&gt;INSERT&lt;/code&gt; statement and execute the statement multiple times to simulate this concurrency in human-doable-times. As below...&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-SQL&quot;&gt;BEGIN TRAN
+
+DECLARE @Name VARCHAR(50) = &apos;A second new photo of me falling over&apos;,
+        @GalleryId INT = 1,
+        @SortOrder INT = NULL
+
+SELECT  @SortOrder = MAX(P.SortOrder) + 1
+FROM    Photo P
+WHERE   P.GalleryId = @GalleryId
+
+SELECT  @SortOrder = ISNULL(@SortOrder, 0)
+
+WAITFOR DELAY &apos;00:00:05&apos;
+
+INSERT INTO Photo (
+        Name,
+        GalleryId,
+        SortOrder
+)
+SELECT  @Name,
+        @GalleryId,
+        @SortOrder
+
+COMMIT TRAN
+
+SELECT  *
+FROM    Photo 
+WHERE   GalleryId = @GalleryId
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;What we&apos;re going to do is run this statement twice. Once with the &lt;code&gt;WAITFOR&lt;/code&gt; and once without. You want to run the statement with the &lt;code&gt;WAITFOR&lt;/code&gt; and then wait a second or two before running the version without the &lt;code&gt;WAITFOR&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/posts/2016-08-14-sql-server-locking-parent-tables/insert-query-duplicate-results.png&quot; alt=&quot;Insert Spurious Data&quot; title=&quot;Insert Spurious Data&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;In this example I&apos;ve ran the statement on the left handside, waited a second or two, and then ran the statement on the right hand side. You can see the left hand side results shows the two &lt;code&gt;Photo&lt;/code&gt; entities with a &lt;code&gt;SortOrder&lt;/code&gt; of 3. Not what we want. What we need to do is take a lock on &lt;code&gt;Photo&lt;/code&gt; of some kind so that concurrent statements are blocked until this statement returns. We don&apos;t want a &lt;code&gt;TABLOCK&lt;/code&gt; or &lt;code&gt;TABLOCKX&lt;/code&gt; as those are too coarse grained. We can instead try an &lt;a href=&quot;https://msdn.microsoft.com/en-us/library/ms187373.aspx&quot;&gt;UPDLOCK&lt;/a&gt; which takes a lock until the entire transaction competes (not just the statement). Let&apos;s update our insertion statement appropriately...&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-SQL&quot;&gt;BEGIN TRAN
+
+DECLARE @Name VARCHAR(50) = &apos;A second new photo of me falling over&apos;,
+        @GalleryId INT = 1,
+        @SortOrder INT = NULL
+
+SELECT  @SortOrder = MAX(P.SortOrder) + 1
+FROM    Photo P (UPDLOCK)
+WHERE   P.GalleryId = @GalleryId
+
+SELECT  @SortOrder = ISNULL(@SortOrder, 0)
+
+WAITFOR DELAY &apos;00:00:05&apos;
+
+INSERT INTO Photo (
+        Name,
+        GalleryId,
+        SortOrder
+)
+SELECT  @Name,
+        @GalleryId,
+        @SortOrder
+
+COMMIT TRAN
+
+SELECT  *
+FROM    Photo 
+WHERE   GalleryId = @GalleryId
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now we&apos;ll re-run our two statements side by side again (I&apos;ve truncated the &lt;code&gt;Photo&lt;/code&gt; table and re-inserted the initial data)&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/posts/2016-08-14-sql-server-locking-parent-tables/insert-query-updlock.png&quot; alt=&quot;Insert with UPDLOCK&quot; title=&quot;Insert with UPDLOCK&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;Hooray! We now get the correct results; all items have unique &lt;code&gt;Photo.SortOrder&lt;/code&gt; values. As per before the left hand side query was executed and then, a few seconds later, I executed the right hand side. One thing to note here is that, as I mentioned, the UPDLOCK takes the lock until the transaction completes. As such the right hand side now takes 3 seconds to complete (as it has to wait for the left hand side&apos;s &lt;code&gt;WAITFOR&lt;/code&gt;). At this stage you&apos;re probably pretty pleased with yourself. So you quickly patch the feature, roll it to production, and pat yourself on the back.&lt;/p&gt;
+&lt;p&gt;A few weeks pass someone notices that, again, there&apos;s duplicate &lt;code&gt;Photo.SortOrder&lt;/code&gt; values for a given &lt;code&gt;Photo.GalleryId&lt;/code&gt;. But we just fixed this! Upon further investigation you notice that the duplicate values are always zero. That&apos;s... interesting you think. Why would that be the case? They duplicate values are always zero so it&apos;s probably something to do with a new &lt;code&gt;Gallery&lt;/code&gt;. Let&apos;s create a new &lt;code&gt;Gallery&lt;/code&gt;;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-SQL&quot;&gt;INSERT INTO Gallery (Name) VALUES (&apos;Kittens&apos;)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now we&apos;ll re-run our &lt;code&gt;INSERT&lt;/code&gt; statements, with the &lt;code&gt;UPDLOCK&lt;/code&gt;, from earlier. Only now for &lt;code&gt;@GalleryId = 2&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/posts/2016-08-14-sql-server-locking-parent-tables/insert-query-updlock-empty-gallery.png&quot; alt=&quot;Insert with UPDLOCK into an empty Gallery&quot; title=&quot;Insert with UPDLOCK into an empty Gallery&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;Ahar! We reproduced the issue. We&apos;ve ended up with two &lt;code&gt;Image.SortOrder&lt;/code&gt; values of 0. Looking at this a bit closer you&apos;ll also notice that, like our initial &lt;code&gt;INSERT&lt;/code&gt;, the right hand side in this query has returned immediately. It no longer waits for the left hand side to execute. But there&apos;s an &lt;code&gt;UPDLOCK&lt;/code&gt;! Shouldn&apos;t it be blocking the right hand side query? Well, unfortunately, because there&apos;s no items SQL Server has nothing to actually lock until the transaction completes. This allows the right hand side to execute before the left hand side has inserted the record. We could modify the &lt;code&gt;UPDLOCK&lt;/code&gt; to be a &lt;code&gt;TABLOCK&lt;/code&gt; or &lt;code&gt;TABLOCKX&lt;/code&gt; but then if I&apos;m inserting into Gallery A I&apos;m blocked by someone else inserting into Gallery B which is less than ideal. Unfortunate because this &lt;code&gt;UPDLOCK&lt;/code&gt; version is nice and granular... but it&apos;s no use to us if we have nothing to lock on. Unless... the &lt;code&gt;Photo&lt;/code&gt; always belongs to a &lt;code&gt;Gallery&lt;/code&gt;, right? And it has a foreign key to &lt;code&gt;Gallery&lt;/code&gt; ensuring this is true. Instead of locking the &lt;code&gt;Photo&lt;/code&gt; can we lock the &lt;code&gt;Gallery&lt;/code&gt;? Let&apos;s try...&lt;/p&gt;
+&lt;p&gt;First we&apos;ll create a new &lt;code&gt;Gallery&lt;/code&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-SQL&quot;&gt;INSERT INTO Gallery (Name) VALUES (&apos;Puppies&apos;)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now we&apos;ll re-work our &lt;code&gt;INSERT&lt;/code&gt; statement to lock the &lt;code&gt;Gallery&lt;/code&gt;;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-SQL&quot;&gt;BEGIN TRAN
+
+DECLARE @Name VARCHAR(50) = &apos;A small puppy&apos;,
+        @GalleryId INT = 3,
+        @SortOrder INT = NULL,
+        @Locked BIT = 0
+
+SELECT  @Locked = 1
+FROM    Gallery G WITH (UPDLOCK, ROWLOCK)
+WHERE   G.Id = @GalleryId
+
+SELECT  @SortOrder = MAX(P.SortOrder) + 1
+FROM    Photo P
+WHERE   P.GalleryId = @GalleryId
+
+SELECT  @SortOrder = ISNULL(@SortOrder, 0)
+
+WAITFOR DELAY &apos;00:00:05&apos;
+
+INSERT INTO Photo (
+        Name,
+        GalleryId,
+        SortOrder
+)
+SELECT  @Name,
+        @GalleryId,
+        @SortOrder
+
+COMMIT TRAN
+
+SELECT  *
+FROM    Photo 
+WHERE   GalleryId = @GalleryId
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&quot;/img/posts/2016-08-14-sql-server-locking-parent-tables/insert-query-gallery-updlock-empty-gallery.png&quot; alt=&quot;Insert with UPDLOCK on Gallery into an empty Gallery&quot; title=&quot;Insert with UPDLOCK on Gallery into an empty Gallery&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;And... success! Once again the right hand side has taken a few seconds to execute as it waits for the left hand side to complete before it can acquire the &lt;code&gt;UPDLOCK&lt;/code&gt; on &lt;code&gt;Gallery&lt;/code&gt;. And once again we have unique values of &lt;code&gt;Photo.SortOrder&lt;/code&gt; as we required. We&apos;ve also introduced the &lt;code&gt;ROWLOCK&lt;/code&gt; hint to indicate we only want to lock the rows returned by the &lt;code&gt;SELECT&lt;/code&gt; on &lt;code&gt;Gallery&lt;/code&gt;. Depending on your index applied this shouldn&apos;t be necessary but I&apos;ve not encountered any issues hinting you only want to lock the row. Between these two hints this ensures that whilst the right hand side took several seconds to complete it is only because it was inserting into the same &lt;code&gt;Gallery&lt;/code&gt; as the left hand side. If you were to insert into a different gallery it&apos;d return instantly.&lt;/p&gt;
+&lt;p&gt;I&apos;ve been running this style of locking model for several months in a production environment and it has completely removed the data duplication we were experiencing. Whilst there&apos;s other methods you could use to eliminate the source of error this one ended up working for me and is also easy to verify the behaviour.&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Finding Dominant Colours in Images</title>
-      <link>http://michaeldavidson.me/2015/10/06/finding-dominant-colours-in-images/</link>
+      <link>http://michaeldavidson.me/technology/2015/10/06/finding-dominant-colours-in-images.html</link>
       <pubDate>Tue, 06 Oct 2015 00:00:00 %z</pubDate>
       <author>Author</author>
-      <guid>http://michaeldavidson.me/2015/10/06/finding-dominant-colours-in-images/</guid>
+      <guid>http://michaeldavidson.me/technology/2015/10/06/finding-dominant-colours-in-images.html</guid>
       <description>&lt;p&gt;A colleague recently shared a link to &lt;a href=&quot;http://charlesleifer.com/blog/using-python-and-k-means-to-find-the-dominant-colors-in-images/&quot;&gt;Charles Leifer&apos;s blog post on finding dominant colours in images&lt;/a&gt; and mentioned it was something he&apos;d like to eventually integrate into our own product at some time. &lt;a href=&quot;https://en.wikipedia.org/wiki/K-means_clustering&quot;&gt;K-Means clustering&lt;/a&gt; is something I have a vague familiarity with but isn&apos;t something I&apos;ve personally implemented before so with a spare day over the weekend I figured I&apos;d give it a shot.&lt;/p&gt;
 &lt;p&gt;If you don&apos;t have an background in algorithms reading about K-Means clustering will lead you to all sorts of &lt;a href=&quot;http://stats.stackexchange.com/a/91076&quot;&gt;Greek letters and mathematical symbols&lt;/a&gt; which may be a little confusing but the actual algorithm is surprisingly straight forward. If you just want to dive straight into the code have a look at &lt;a href=&quot;https://github.com/MrMDavidson/code-samples/tree/master/FindDominantColour&quot;&gt;my code samples repository&lt;/a&gt; which has a simple implementation. Otherwise, stick with me.&lt;/p&gt;
 &lt;p&gt;If you&apos;re not familiar with this idea it might help to start with a few examples. Below are three examples produced via the code linked above. In each of them the bottom of the image has three colour swatches which are the k means clusters (in this example, k is 3).&lt;/p&gt;
@@ -130,10 +310,10 @@ List&amp;lt;Color&amp;gt; filtered = GetSourceData()
     
     <item>
       <title>The Curse of the Evergreen Web</title>
-      <link>http://michaeldavidson.me/2015/09/12/the-curse-of-the-evergreen-web/</link>
+      <link>http://michaeldavidson.me/technology/2015/09/12/the-curse-of-the-evergreen-web.html</link>
       <pubDate>Sat, 12 Sep 2015 00:00:00 %z</pubDate>
       <author>Author</author>
-      <guid>http://michaeldavidson.me/2015/09/12/the-curse-of-the-evergreen-web/</guid>
+      <guid>http://michaeldavidson.me/technology/2015/09/12/the-curse-of-the-evergreen-web.html</guid>
       <description>&lt;p&gt;With the release of Windows 10 Microsoft introduced a new browser, Edge, that promised to free us web developers from having to support IE 12 in 10 years time like we do with IE6 now. Edge is hardly the first browser to introduce constantly updated versions; Firefox and Chrome have been doing this for years. Most users of either of these browsers wouldn&apos;t have a clue what particular version of those browsers they&apos;re on. (Don&apos;t believe me? Quick, talk to a colleague, a friend, a relative and ask them if they&apos;re running Chrome 44 or Chrome 45. I&apos;ll wait...) This is something Scott Hanselman refers to as &lt;a href=&quot;http://www.hanselman.com/blog/TheEvergreenWeb.aspx&quot;&gt;The Evergreen Web&lt;/a&gt;. In the article Scott talks about the importance of compatibility modes and as time progresses they&apos;re going to become more and more important. However when most developers think of browsers and compatibility modes they think rendering engines but I recently stumbled across some behaviour in Chrome 45 that was fundamentally different (and broken) as compared to the behaviour of Chrome 44. It made me realise there&apos;s a curse to the &amp;quot;Evergreen Web&amp;quot; - we developers seem to think it&apos;ll only ever mean things will get better. But humans write software and humans make mistakes. So bugs will ineveitably be introduced into the latest versions of browsers. Bugs that will break existing, well documented, standardised behaviour.&lt;/p&gt;
 &lt;p&gt;A little bit of background here; Many years ago the developers of the HTTP specification realised that connection speeds aren&apos;t infinite, that time outs happen, connections drop, and that resources can be large. So they implemented something called range requests and responses. When your browser talks to a server it tells the server &amp;quot;Hey! I want all of this resource!&amp;quot; it does this by using a request header of &lt;code&gt;Range: bytes=0-&lt;/code&gt;. This tells the server that the web browser knows about range requests and it&apos;s currently requesting the range 0 to the end of the file. If the resource is hosted on even a remotely modern web server the server will respond with a slightly different response to normal. For one it will return a response code of &lt;code&gt;206 Partial Content&lt;/code&gt; instead of a standard &lt;code&gt;200 OK&lt;/code&gt; response. Additionally you&apos;ll see headers something like;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;Accept-Ranges: bytes
@@ -168,10 +348,10 @@ Content-Range: bytes 400-1233/1234
     
     <item>
       <title>SQL Server Tricks</title>
-      <link>http://michaeldavidson.me/2015/09/06/sql-server-tricks/</link>
+      <link>http://michaeldavidson.me/technology/2015/09/06/sql-server-tricks.html</link>
       <pubDate>Sun, 06 Sep 2015 00:00:00 %z</pubDate>
       <author>Author</author>
-      <guid>http://michaeldavidson.me/2015/09/06/sql-server-tricks/</guid>
+      <guid>http://michaeldavidson.me/technology/2015/09/06/sql-server-tricks.html</guid>
       <description>&lt;p&gt;Throughout my career I&apos;ve spent more than my fair share of time in the database layer. There&apos;s a current trent in the .Net world of just letting your ORM take care of everything in the data layer for you. I&apos;m a huge proponent of using an ORM for mapping (at work we&apos;re currently using StackExchange&apos;s &lt;a href=&quot;https://github.com/StackExchange/dapper-dot-net&quot;&gt;Dapper.net&lt;/a&gt;). However I&apos;ve always been a little wary of letting the ORM do everything for you. As such I thought I&apos;d jot down a few handy SQL Server tricks I&apos;ve picked up over the years.&lt;/p&gt;
 &lt;h3&gt;1. The Output Clause&lt;/h3&gt;
 &lt;p&gt;The &lt;a href=&quot;https://msdn.microsoft.com/en-us/library/ms177564.aspx&quot;&gt;&lt;code&gt;OUTPUT&lt;/code&gt; clause&lt;/a&gt; let&apos;s you execute a data modification statement and have it project a result set. In plain English that means that you can perform a &lt;code&gt;DELETE&lt;/code&gt;, &lt;code&gt;INSERT&lt;/code&gt; or &lt;code&gt;UPDATE&lt;/code&gt; &lt;strong&gt;and&lt;/strong&gt; have it return a resultset. This has been around since SQL Server 2008 but doesn&apos;t seem to get much attention. An example might be;&lt;/p&gt;
@@ -285,11 +465,11 @@ Here we can see that the right hand query, SPID 52, is currently blocked by SPID
     
     <item>
       <title>Tags?</title>
-      <link>http://michaeldavidson.me/2015/08/31/tags/</link>
+      <link>http://michaeldavidson.me/technology/2015/08/31/tags.html</link>
       <pubDate>Mon, 31 Aug 2015 00:00:00 %z</pubDate>
       <author>Author</author>
-      <guid>http://michaeldavidson.me/2015/08/31/tags/</guid>
-      <description>&lt;p&gt;After doing my initial &lt;a href=&quot;/2015/08/30/myfirstpost.html&quot;&gt;post yesterday&lt;/a&gt; I realised it&apos;d be useful to have tags (or categories, whatever your preferred nomenclature) support. It&apos;s an easy way for a user to quickly find everything relating to, say, &lt;a href=&quot;/tag/pretzel&quot;&gt;Pretzel&lt;/a&gt; without having to read about &lt;a href=&quot;/tag/cats&quot;&gt;cats&lt;/a&gt;. How do we go about getting such a feature? Remeember that Pretzel is a static blog engine. Everything is generated offline on your computer and then uploaded to your host (in my case, &lt;a href=&quot;https://pages.github.com&quot;&gt;Github Pages&lt;/a&gt;) so there&apos;s no hitting a database to pull back the relevant files.&lt;/p&gt;
+      <guid>http://michaeldavidson.me/technology/2015/08/31/tags.html</guid>
+      <description>&lt;p&gt;After doing my initial &lt;a href=&quot;technology/2015/08/30/myfirstpost.html&quot;&gt;post yesterday&lt;/a&gt; I realised it&apos;d be useful to have tags (or categories, whatever your preferred nomenclature) support. It&apos;s an easy way for a user to quickly find everything relating to, say, &lt;a href=&quot;/tag/pretzel&quot;&gt;Pretzel&lt;/a&gt; without having to read about &lt;a href=&quot;/tag/cats&quot;&gt;cats&lt;/a&gt;. How do we go about getting such a feature? Remeember that Pretzel is a static blog engine. Everything is generated offline on your computer and then uploaded to your host (in my case, &lt;a href=&quot;https://pages.github.com&quot;&gt;Github Pages&lt;/a&gt;) so there&apos;s no hitting a database to pull back the relevant files.&lt;/p&gt;
 &lt;p&gt;If you investigate a little bit you&apos;ll find that when you&apos;re viewing an individual post the template used to generate the static HTML is &lt;a href=&quot;https://github.com/MrMDavidson/mrmdavidson.github.io/blob/a3b3e198dbecbbe6e86893ab0276963eb694cf70/_layouts/post.html&quot;&gt;_layouts/post.html&lt;/a&gt; which seems to have some code relating to tags;&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;{% for tag in page.tags %}
     &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;/tag/{{ tag }}&amp;quot;&amp;gt;{{ tag }}&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;
@@ -382,10 +562,10 @@ layout: layout
     
     <item>
       <title>My First Post</title>
-      <link>http://michaeldavidson.me/2015/08/30/myfirstpost/</link>
+      <link>http://michaeldavidson.me/technology/2015/08/30/myfirstpost.html</link>
       <pubDate>Sun, 30 Aug 2015 00:00:00 %z</pubDate>
       <author>Author</author>
-      <guid>http://michaeldavidson.me/2015/08/30/myfirstpost/</guid>
+      <guid>http://michaeldavidson.me/technology/2015/08/30/myfirstpost.html</guid>
       <description>&lt;p&gt;Several years ago now Scott Hanselman wrote a blog post titled &lt;a href=&quot;http://www.hanselman.com/blog/YourBlogIsTheEngineOfCommunity.aspx&quot;&gt;Your Blog is the Engine of Community&lt;/a&gt;. The basic premise of it, for those too lazy to read it, was that you should own your own content. Sites like Twitter and Facebook are intrinsically transient and, perhaps more importantly, owned by someone else. &amp;quot;That makes sense!&amp;quot; I thought. And so I had a look about on the internet came across &lt;a href=&quot;https://pages.github.com/&quot;&gt;Github Pages&lt;/a&gt; had a quick play and... forgot about it. And then today a friend of mine was looking at ditching Wordpress for their own blog and asked if I had any suggestions. I gave a half hearted reply about something like &lt;a href=&quot;https://pages.github.com/&quot;&gt;Github Pages&lt;/a&gt; and then... thought about it... and thought I should finally get my act together and finish playing with them myself.&lt;/p&gt;
 &lt;p&gt;My initial issue last time I looked into Github Pages was that they run &lt;a href=&quot;http://jekyllrb.com/&quot;&gt;Jekyll&lt;/a&gt;. Which isn&apos;t a bad thing, it&apos;s a nice bit of software, but as a Windows developer it seemed like a bunch of things I&apos;ve only had passing exposure to. I had a look for other static blog engines and came across &lt;a href=&quot;http://code52.org/pretzel.html&quot;&gt;Pretzel&lt;/a&gt;. Like Jekyll Pretzel generates a static blog for you from &lt;a href=&quot;http://daringfireball.net/projects/markdown/&quot;&gt;Markdown&lt;/a&gt; however unlike Jekyll it&apos;s written in .Net and feels more &amp;quot;natural&amp;quot; to a C# developer like myself. I did, however, have a few minor issues along the way, so I figured I&apos;d kill two birds with one stone and write about them.&lt;/p&gt;
 &lt;h2&gt;1.  Getting Pretzel&lt;/h2&gt;
